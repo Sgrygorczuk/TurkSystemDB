@@ -2,14 +2,20 @@ import SupportMethods as sm
 
 class TaskDB:
 	db = "taskDB"
-	def __init__(self, userId = 'Nan', issueDesc = "", resolved = "unresolved"):
+	def __init__(self, userId = 'Nan', issueDesc = "", resolved = False):
 		self.issueId = 'Nan'
 		self.setAll(userId, issueDesc, resolved)
 	
 	#create a new DB if a new project is made by initializing class
-		if clientId!='Nan':
+		if self.issueId!='Nan':
 			self.newIssue(userId, issueDesc, resolved)
-		
+	
+	def setAll(self, userId, issueDesc, resolved):
+		self.userId = userId
+		self.issueDesc = issueDesc
+		self.resolved = resolved #true/false
+		self.getNextIssue() # get and set next unrevolved issue
+	
 	#will load DB into the class (must at least set ID) will return 1 or 0 upon success or failure respectively
 	def loadDB(self):
 		if self.issueId != 'Nan':
@@ -21,11 +27,9 @@ class TaskDB:
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
 		#self.issueId = dict["id"]
-		self.setAll(dict["clientId"], dict["projectId"], dict["startDate"])
+		self.setAll(dict["issueId"], dict["userId"], dict["issueDesc"], dict["resolved"])
 
 	#get methods
-	def getNewIssue(self): #returns where getResolved==False, from old->new
-		pass
 	def getIssueId(self): 
 		return self.issueId
 	def getUserId(self): 
@@ -34,19 +38,18 @@ class TaskDB:
 		return self.issueDesc
 	def getResolved(self): 
 		return self.resolved
+	def getNextIssue(self):
+		self.nextIssue = sm.find(self.db, "resovled", False)
+		return self.nextIssue
  
 	#create a new taskDB
 	def newIssue(self, userId, issueDesc, resolved): 
-		self.issueId = sm.getlastId(self.db)
+		self.issueId = sm.getlastId(self.db) + 1 #last+1 for new
 		sm.push(self.db, self.issueId, userId, issueDesc, resolved)
 		if self.userId!= userId:
 			self.setAll(userId, issueDesc, resolved)
 	
 	#update bidDB
-	def setAll(self, userId, issueDesc, resolved):
-		self.userId = userId
-		self.issueDesc = issueDesc
-		self.resolved = self.resolved #true/false
 	def setIssueId(self, issueId):
 		self.issueId = issueId
 		sm.set(self.db, self.issueId, "issueId", issueId)

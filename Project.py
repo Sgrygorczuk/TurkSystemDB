@@ -46,7 +46,7 @@ class ProjectDB:
 
 	#create a new projectDB
 	def newProject(self, clientId, bidId, devIds, title, desc, startDate, endDate, status):
-		self.projectId = sm.getlastId(self.db)
+		self.projectId = sm.getlastId(self.db) + 1 #last+1 for new
 		sm.push(self.db, self.projectId, clientId, bidId, devIds, title, desc, startDate, endDate, status)
 		if self.clientId!= clientId:
 			self.setAll(clientId, bidId, devIds, title, desc, startDate, endDate, status)

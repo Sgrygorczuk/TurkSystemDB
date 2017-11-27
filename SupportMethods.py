@@ -3,12 +3,12 @@ import json
 
 filename1="dummy.json"
 
-usercredentials: id, username and password
-user: id, type, status, balance
-userinfo: id, pic...
+# usercredentials: id, username and password
+# user: id, type, status, balance
+# userinfo: id, pic...
 
-project: id, devIds.... client
-task: SU 
+# project: id, devIds.... client
+# task: SU 
 
 #load DB from JSON
 #DB is the database file
@@ -33,12 +33,17 @@ def push(DB, *args): pass #method not made
 	# with open (file_out,'w+') as txt:
 		# json.dump(data, jsonFile)
 
-#modify an existing attribute
+#Given a db, id of user, and the key within the array, modify an existing attribute
 def set(DB, id, key, attribute):
 	pass #method not made
 	
-#find a certain attribute
-def find(DB, id, attribute):
+#Given a db, id of user, and the key within the array, get a certain attribute
+def get(DB, id, key):
+	pass #method not made
+	
+#Given a db and the key within the array, find a certain attribute from top down
+#unless it is reversed
+def find(DB, key, attribute, reversed = False):
 	pass #method not made
 
 #remove a whole row

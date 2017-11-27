@@ -4,7 +4,7 @@ class BidDB:
 	db = "bidDB"
 	def __init__(self, clientId = 'Nan' , projectId = 'Nan', startDate = 0, endDate = 0, bidLog = [[] for i in range(3)], status = "active"):
 		self.bidId = 'Nan'
-		self.setAll(self, clientId, projectId, startDate, endDate, bidLog, status)
+		self.setAll(clientId, projectId, startDate, endDate, bidLog, status)
 		
 		#create a new DB if a new project is made by initializing class
 		if clientId!='Nan':
@@ -41,10 +41,10 @@ class BidDB:
 
 	#create a new bidDB
 	def newBid(self, clientId, projectId, startDate, endDate, bidLog, status):
-		self.bidId = sm.getlastId(self.db)
+		self.bidId = sm.getlastId(self.db) + 1 #last+1 for new
 		sm.push(self.db, self.bidId, clientId, projectId, startDate, endDate, bidLog)
 		if self.clientId!= clientId:
-			self.setAll(self, clientId, projectId, startDate, endDate, bidLog, status)
+			self.setAll(clientId, projectId, startDate, endDate, bidLog, status)
 	
 	#update bidDB
 	def setAll(self, clientId, projectId, startDate, endDate, bidLog, status):
