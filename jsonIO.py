@@ -57,41 +57,39 @@ def add_row(DB, row):
 ############################################################################
 
 # 3. remove a row from DB.json
-# pre: DB.json exist, row = {"id":exists, ...}
-# post: a row is removed from DB.json
-def del_row(DB, row):
+# pre: DB.json exist, id is a valid id for the DB
+# post: a row is removed from DB.json if a row with the id exists on the DB.
+#       Otherwise, there no change on DB.json.
+# remove a row from a DB
+def del_row(DB, id):
     # read rows from json DB
     rows = read_rows(DB)
-
-    # check if the row exists   
-    for item in rows:
-        if item["id"] == row["id"]: # all our database tables has a "id" attribute
-            # remove the row
-            print('remove a row with id = ', row['id'])
-            rows.remove(row)
-            new_DB = {DB: rows}
-            # update json
-            with open(DB+'.json', 'w') as f:
-                json.dump(new_DB, f)
-            break
-    else:
-        print("the row doesn't exist in" + DB)
+    
+    # remove a row with passed in 'id'
+    filtered_rows = list(filter(lambda item: item['id'] != id, rows))
+    print(len(rows)-len(filtered_rows),'item was removed from '+DB)
+    
+    # update json
+    new_DB = {DB: filtered_rows}
+    with open(DB+'.json', 'w') as f:
+        json.dump(new_DB, f)
 
 ### TEST 
-# del_row("projects", project1)
+# del_row("projects", 11)
+# del_row("projects", 11) # 0 item was removed from projects.
 ############################################################################
 
 # 4. select rows from DB.json
 # pre: DB.json exist, "id" is the valid id format for the DB.json
-# post: returns a [{row1}, {row2}, ...] where each rows' id is "id"
+# post: returns a [{row1}] where each rows' id is "id"
 #       if no rows with the "id" exists, [] will be returned.
-def get_rows(DB, id):
+def get_row(DB, id):
     # read rows from json DB
     rows = read_rows(DB)
     
-    # rows with passed in 'id'
-    filtered_rows = list(filter(lambda item: item['id'] == id, rows))
-    return filtered_rows
+    # row with passed in 'id'
+    filtered_row = list(filter(lambda item: item['id'] == id, rows))
+    return filtered_row
 
 ### TEST
 get_rows("projects", 22)
