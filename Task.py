@@ -1,77 +1,77 @@
-import SupportMethods as sm
+import jsonIO as jio
 
-class TaskDB:
-	db = "taskDB"
-	def __init__(self, userId = 'Nan', issueDesc = "", resolved = False):
-		self.issueId = 'Nan'
-		self.setAll(userId, issueDesc, resolved)
+class Task_db:
+	db = "task_db"
+	def __init__(self, user_id = 'Nan', issue_desc = "", resolved = False):
+		self.issue_id = 'Nan'
+		self.set_all(user_id, issue_desc, resolved)
 	
-	#create a new DB if a new project is made by initializing class
-		if self.issueId!='Nan':
-			self.newIssue(userId, issueDesc, resolved)
+	#create a new db if a new project is made by initializing class
+		if self.issue_id!='Nan':
+			self.new_issue(user_id, issue_desc, resolved)
 	
-	def setAll(self, userId, issueDesc, resolved):
-		self.userId = userId
-		self.issueDesc = issueDesc
+	def set_all(self, user_id, issue_desc, resolved):
+		self.user_id = user_id
+		self.issue_desc = issue_desc
 		self.resolved = resolved #true/false
-		self.getNextIssue() # get and set next unrevolved issue
+		self.get_next_issue() # get_ and set_ next unrevolved issue
 	
-	#will load DB into the class (must at least set ID) will return 1 or 0 upon success or failure respectively
-	def loadDB(self):
-		if self.issueId != 'Nan':
-			self.dump(sm.loadDB(self.db,self.issueId))
+	#will load db into the class (must at least set_ ID) will return 1 or 0 upon success or failure respectively
+	def load_db(self):
+		if self.issue_id != 'Nan':
+			self.dump(jio.load_db(self.db,self.issue_id))
 			return 1
 		else:
 			return 0
 			
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
-		#self.issueId = dict["id"]
-		self.setAll(dict["issueId"], dict["userId"], dict["issueDesc"], dict["resolved"])
+		#self.issue_id = dict["id"]
+		self.set_all(dict["user_id"], dict["issue_desc"], dict["resolved"])
 
-	#get methods
-	def getIssueId(self): 
-		return self.issueId
-	def getUserId(self): 
-		return self.userId
-	def getIssueDesc(self): 
-		return self.issueDesc
-	def getResolved(self): 
+	#get_ methods
+	def get_issue_id(self): 
+		return self.issue_id
+	def get_user_id(self): 
+		return self.user_id
+	def get_issue_desc(self): 
+		return self.issue_desc
+	def get__resolved(self): 
 		return self.resolved
-	def getNextIssue(self):
-		self.nextIssue = sm.find(self.db, "resovled", False)
-		return self.nextIssue
+	def get_next_issue(self):
+		self.next_issue = jio.find(self.db, "resovled", False)
+		return self.next_issue
  
-	#create a new taskDB
-	def newIssue(self, userId, issueDesc, resolved): 
-		self.issueId = sm.getlastId(self.db) + 1 #last+1 for new
-		sm.push(self.db, self.issueId, userId, issueDesc, resolved)
-		if self.userId!= userId:
-			self.setAll(userId, issueDesc, resolved)
+	#create a new task_db
+	def new_issue(self, user_id, issue_desc, resolved): 
+		self.issue_id = jio.get_row(self.db) + 1 #last+1 for new
+		jio.push(self.db, self.issue_id, user_id, issue_desc, resolved)
+		if self.user_id!= user_id:
+			self.set_all(user_id, issue_desc, resolved)
 	
-	#update bidDB
-	def setIssueId(self, issueId):
-		self.issueId = issueId
-		sm.set(self.db, self.issueId, "issueId", issueId)
+	#update bid_db
+	def set_issue_id(self, issue_id):
+		self.issue_id = issue_id
+		jio.set_(self.db, self.issue_id, "id", issue_id)
 		return 1;
-	def setUserId(self, userId):
-		self.userId = userId
-		sm.set(self.db, self.issueId, "userId", userId)
+	def set_user_id(self, user_id):
+		self.user_id = user_id
+		jio.set_(self.db, self.issue_id, "user_id", user_id)
 		return 1;
-	def setIssueDesc(self, issueDesc):
-		self.issueDesc = issueDesc
-		sm.set(self.db, self.issueId, "issueDesc", issueDesc)
+	def set_issue_desc(self, issue_desc):
+		self.issue_desc = issue_desc
+		jio.set_(self.db, self.issue_id, "issue_desc", issue_desc)
 		return 1;
-	def setResolved(self, resolved):
+	def set_resolved(self, resolved):
 		self.resolved = resolved
-		sm.set(self.db, self.issueId, "resolved", resolved)
+		jio.set_(self.db, self.issue_id, "resolved", resolved)
 		return 1;
 
-	def removeTask(self):
-		sm.remove(self.db, self.issueId)
+	def remove_task(self):
+		jio.remove(self.db, self.issue_id)
 		return 1;
 
 	#destructor
 	def __del__(self):
 		raise Exception("Something went wrong when destroying")
-		print (self.issueId, ' was destroyed.')
+		print (self.issue_id, ' was destroyed.')
