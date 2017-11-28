@@ -1,185 +1,188 @@
-import SupportMethods as sm
+import jsonIO as jio
 
-#There are UserDB>SU | Customer>Temp | Registered> Client | Developer | Blacklisted
-class UserDB:
-	uDB = "userDB"
-	ucDB = "userCredDB"
-	uiDB = "userInfoDB"
+#There are _user_db>SU | Customer>Temp | Registered> Client | Developer | Blacklisted
+class User_db:
+	db = "user_db"
 	
-	def __init__(self, username = "", password = "", userType = "", status = "", balance = 0, 
-		resume = "", pic = "", interest = "", issueIds = [],
-		rating = 'Nan', projectIds = [], activeProject = 'Nan'):
-		#userCredDB
+	def __init__(self, username = "", password = "", user_type = "", status = "", balance = 0, warning = 0, 
+		resume = "", pic = "", interest = "", issue_ids = [],
+		rating = 'Nan', project_ids = [], active_project = 'Nan'):
+		#userCred_db
 		self.id = 'Nan'
 		self.username = username
 		self.password = password
-		#userDB
-		self.userType = userType #temp, dev, client, SU
+		#fot customer
+		self.user_type = user_type #temp, dev, client, SU
 		self.status = status #(active, blacklisted, temp)
 		self.balance = balance
-		#userInfoDB
 		self.resume = resume
 		self.interest = interest
 		self.pic = pic
-		self.issueIds = issueIds
+		self.issue_ids = issue_ids
 		#for registered only
 		self.rating = rating
-		self.projectIds = projectIds #list of project Ids that has been worked or active
-		self.activeProject = activeProject #a single projectId
+		self.project_ids = project_ids #list of project Ids that has been worked or active
+		self.active_project = active_project #a single projectId
+		self.warning = warning #warning before termination
 		
-		#create a new DB if a new project is made by initializing class
+		#create a new db if a new project is made by initializing class
 		if self.id!='Nan':
-			self.newUser(id, username, password, userType, status, balance, resume, interest, pic, issueIds, rating, projectIds, activeProject)
+			self.new_user(id, username, password, user_type, status, warning, balance, resume, interest, pic, issue_ids, rating, project_ids, active_project)
 
-	#will load DB into the class (must at least set ID) will return 1 or 0 upon success or failure respectively
-	def loadDB(self):
+	#will load db into the class (must at least set_ ID) will return 1 or 0 upon success or failure respectively
+	def load_db(self):
 		if self.id != 'Nan':
-			self.dump(sm.loadDB(self.uDB), sm.loadDB(self.ucDB), sm.loadDB(self.uiDB))
+			self.dump(sm.get_row(self.db))
 			return 1
 		else:
 			return 0
 	
 	#breakdown the array and load into the class
-	def dump(self, userDict, userCredDict, userInfoDict): 
+	def dump(self, dict):
 		#self.id = dict["id"]
-			self.setAll(userCredDict["username"], userCredDict["password"],
-			userDict["userType"], userDict["status"], userDict["balance"],
-			userInfoDict["resume"], userInfoDict["interest"], userInfoDict["pic"], userInfoDict["issueIds"],
-			userInfoDict["rating"], userInfoDict["projectIds"], userInfoDict["activeProject"])
+			self.set_all(dict["username"], dict["password"],
+			dict["user_type"], dict["status"], dict["balance"], dict["warning"],
+			dict["resume"], dict["interest"], dict["pic"], dict["issue_ids"],
+			dict["rating"], dict["project_ids"], dict["active_project"])
 	
-	#get methods user
-	def getId(self): 
+	#get_ methods user
+	def get_Id(self): 
 		return self.id
-	def getUsername(self): 
+	def get_username(self): 
 		return self.username
-	def getPassword(self): 
+	def get_password(self): 
 		return self.password
-	def getUserType(self): 
-		return self.userType
-	def getStatus(self): 
+	def get_user_type(self): 
+		return self.user_type
+	def get_status(self): 
 		return self.status
-	def getBalance(self): 
+	def get_balance(self): 
 		return self.balance
-	#get methods userinfo
-	def getResume(self): 
+	def get_Warning(self):
+		return self.warning
+	#get_ methods userinfo
+	def get_resume(self): 
 		return self.resume
-	def getInterest(self): 
+	def get_interest(self): 
 		return self.interest
-	def setIssueIds(self): 
-		return self.issueIds
-	#get methods for registered only
-	def getprojectIds(self): 
-		return self.projectIds
-	def getActiveProject(self): 
-		return self.activeProject
+	def set_issue_ids(self): 
+		return self.issue_ids
+	#get_ methods for registered only
+	def get_project_ids(self): 
+		return self.project_ids
+	def get_active_project(self): 
+		return self.active_project
 		
-	#create a new userDB
-	def newUser(self, id, username, password, userType, status, balance,
-		resume="", pic="", interest="", issueIds = [], rating ='Nan',
-		ProjectIds=[], activeProject='Nan'):
-		#self.id = sm.getlastId(self.db)
-		sm.push(self.ucDB, self.id, username, password)
-		sm.push(self.uDB, self.id, userType, status, balance)
-		sm.push(self.uiDB, self.id, resume, pic, interest, issueIds, rating, ProjectIds, activeProject)                   
+	#create a new user_db
+	def new_user(self, id, username, password, user_type, status, balance, warning,
+		resume="", pic="", interest="", issue_ids = [], rating ='Nan',
+		project_ids=[], active_project='Nan'):
+		#self.id = sm.get_lastId(self._db)
+		sm.push(self.db, self.id, username, password)
+		sm.push(self.db, self.id, user_type, status, balance, warning)
+		sm.push(self.db, self.id, resume, pic, interest, issue_ids, rating, project_ids, active_project)                   
 		if self.id!= id:
 			self.id = id
-			self.setAll(username, password, userType, status, balance, resume, pic, interest, issueIds, rating, ProjectIds, activeProject)
+			self.set_all(username, password, user_type, status, balance, resume, pic, interest, issue_ids, rating, project_ids, active_project)
 	
-	#update userDB
-	def setAll(self, username, password, userType, status, balance,
-		resume="", pic="", interest="", issueIds = [], rating ='Nan',
-		ProjectIds=[], activeProject='Nan'):
-		#userCredDB
+	#update user_db
+	def set_all(self, username, password, user_type, status, balance, warning,
+		resume="", pic="", interest="", issue_ids = [], rating ='Nan',
+		project_ids=[], active_project='Nan'):
+		#userCred_db
 		self.id = id
 		self.username = username
 		self.password = password
-		#userDB
-		self.userType = userType #temp, dev, client, SU
+		#user_db
+		self.user_type = user_type #temp, dev, client, SU
 		self.status = status #(active, blacklisted, temp)
 		self.balance = balance
-		#userInfoDB
+		self.warning = warning
+		#userInfo_db
 		self.resume = resume
 		self.interest = interest
 		self.pic = pic
-		self.issueIds = issueIds
+		self.issue_ids = issue_ids
 		#for registered only
 		self.rating = rating
-		self.projectIds = projectIds #list of project Ids that has been worked or active
-		self.activeProject = activeProject #a single projectId
+		self.project_ids = project_ids #list of project Ids that has been worked or active
+		self.active_project = active_project #a single projectId
 	
-	#update userDB will return 1 or 0 upon success or failure respectively
-	def setId(self,id):
+	#update user_db will return 1 or 0 upon success or failure respectively
+	def set_Id(self,id):
 		self.id = id		#update this class
-		sm.set(self.uDB, self.id, "id", self.id) #update DB
-		sm.set(self.uiDB, self.id, "id", self.id) #update DB
-		sm.set(self.ucDB, self.id, "id", self.id) #update DB
+		sm.set_(self.db, self.id, "id", self.id) #update db
 		return 1			#success
-	def setUserType(self, userType):
-		self.userType = userType
-		sm.set(self.uDB, self.id, "userType", userType)
+	def set_user_type(self, user_type):
+		self.user_type = user_type
+		sm.set_(self.db, self.id, "user_type", user_type)
 		return 1
-	def setStatus(self, status):
+	def set_status(self, status):
 		self.status = status
-		sm.set(self.uDB, self.id, "status", status)
+		sm.set_(self.db, self.id, "status", status)
 		return 1
 		
-	#update userInfoDB
+	#update userInfo_db
 	def deposit(self, amount):
 		self.amount += amount
-		sm.set(self.uiDB, self.id, "balance", self.amount)
+		sm.set_(self.db, self.id, "balance", self.amount)
 		return 1
 	def withdraw(self, amount):
-		if getBalance() >= amount:
+		if get_balance() >= amount:
 			self.amount -= amount
-			sm.set(self.uiDB, self.id, "balance", self.amount)
+			sm.set_(self.db, self.id, "balance", self.amount)
 			return 1
 		else:
 			return 0
-	
-	#update userCredentialDB
-	def setUsername(self, username):
-		self.username = username
-		sm.set(self.ucDB, self.id, "username", username)
+	def set_Warning(self, warning):
+		self.warning = warning
+		sm.set_(self.db, self.id, "warning", warning)
 		return 1
-	def setPassword(self, password):
+		
+	#update userCredential_db
+	def set_username(self, username):
+		self.username = username
+		sm.set_(self.db, self.id, "username", username)
+		return 1
+	def set_password(self, password):
 		self.password = password
-		sm.set(self.ucDB, self.id, "password", password)
+		sm.set_(self.db, self.id, "password", password)
 		return 1
 	
 	#update userInfo
-	def setResume(self, resume):
+	def set_resume(self, resume):
 		self.resume = resume
-		sm.set(self.uiDB, self.id, "resume", resume)
+		sm.set_(self.db, self.id, "resume", resume)
 		return 1
-	def setPic(self, pic):
+	def set_Pic(self, pic):
 		self.pic = pic
-		sm.set(self.uiDB, self.id, "pic", pic)
+		sm.set_(self.db, self.id, "pic", pic)
 		return 1
-	def setInterest(self, insterest):
+	def set_interest(self, insterest):
 		self.insterest = insterest
-		sm.set(self.uiDB, self.id, "insterest", insterest)
+		sm.set_(self.db, self.id, "insterest", insterest)
 		return 1
-	def setIssueNum(self, issueNum):
+	def set_IssueNum(self, issueNum):
 		self.issueNum = issueNum
-		sm.set(self.uiDB, self.id, "issueNum", issueNum)
+		sm.set_(self.db, self.id, "issueNum", issueNum)
 		return 1	
 	
-	#update userInfoDB
-	def setRating(self, rating):
+	#update userInfo_db
+	def set_rating(self, rating):
 		self.rating = rating
-		sm.set(self.uiDB, self.id, "rating", rating)
+		sm.set_(self.db, self.id, "rating", rating)
 		return 1
-
-	#update projectDB
-	def setprojectIds(self, setprojectIds):
-		self.setprojectIds = setprojectIds
-		sm.set(self.uiDB, self.id, "setprojectIds", setprojectIds)
+	def set_project_ids(self, project_ids):
+		self.project_ids = project_ids
+		sm.set_(self.db, self.id, "project_ids", project_ids)
+		return 1
+	def set_active_project(self, active_project):
+		self.active_project = active_project
+		sm.set_(self.db, self.id, "active_project", active_project)
 		return 1
 	
-	def removeUser(self, id):
-		sm.remove(self.ucDB, self.id)
-		sm.remove(self.uDB, self.id)
-		sm.remove(self.uiDB, self.id)
+	def remove_user(self, id):
+		sm.remove(self.db, self.id)
 
 	#destructor
 	def __del__(self):
