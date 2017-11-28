@@ -11,18 +11,28 @@ create_DB("projects")
 # create_DB("bids")
 ############################################################################
 
-# 2. add a row into a DB.json
+# 2-0. help function - read all rows from DB.json
+# pre: DB.json exists on the same directory
+# post: returns [{row1}, {row2}, ...]
+def read_rows(DB):
+    rows = []
+    with open(DB+'.json', 'r') as f:
+        rows = json.load(f)[DB]     # [{row1}, {row2}, ...]
+    return rows
 
+### TEST
+# print(read_rows("projects"))
+############################################################################
+
+# 2. add a row into DB.json
 # pre: 
 	# DB = "projects"
 	# row1 = {"projectId":11, "clientId":3, ... "status":"active"}
 # post: update json file
 	# DB.json = { "DB": [{row1}, {row2}, ...] } 
-def add_row(DB,row):
+def add_row(DB, row):
     # read rows from json DB
-    rows = []
-    with open(DB+'.json', 'r') as f:
-        rows = json.load(f)[DB]     # [{row1}, {row2}, ...]
+    rows = read_rows(DB)
 
     # check if the row exists   
     for item in rows:
@@ -35,7 +45,7 @@ def add_row(DB,row):
         new_DB = {DB: rows}
         # update json
         with open(DB+'.json', 'w') as f:
-            json.dump(new_DB, f)       
+            json.dump(new_DB, f)
 
 ### TEST - eg. add a project into the project.json
 # project1 = {"id":11, "clientId":3, "developerId":1, "title":"project 1", "description":"testing project 1", 
@@ -46,12 +56,12 @@ def add_row(DB,row):
 # add_row("projects", project2)
 ############################################################################
 
-# 3. remove a row from a DB
+# 3. remove a row from DB.json
+# pre: DB.json exist, row = {"id":exists, ...}
+# post: a row is removed from DB.json
 def del_row(DB, row):
     # read rows from json DB
-    rows = []
-    with open(DB+'.json', 'r') as f:
-        rows = json.load(f)[DB]     # [{row1}, {row2}, ...]
+    rows = read_rows(DB)
 
     # check if the row exists   
     for item in rows:
@@ -69,4 +79,21 @@ def del_row(DB, row):
 
 ### TEST 
 # del_row("projects", project1)
+############################################################################
+
+# 4. select rows from DB.json
+# pre: DB.json exist, "id" is the valid id format for the DB.json
+# post: returns a [{row1}, {row2}, ...] where each rows' id is "id"
+#       if no rows with the "id" exists, [] will be returned.
+def get_rows(DB, id):
+    # read rows from json DB
+    rows = read_rows(DB)
+    
+    # rows with passed in 'id'
+    filtered_rows = list(filter(lambda item: item['id'] == id, rows))
+    return filtered_rows
+
+### TEST
+get_rows("projects", 22)
+get_rows("projects", 111111) # should return []
 ############################################################################
