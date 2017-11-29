@@ -160,16 +160,15 @@ def get_value(DB, id, key):
 
 # 6. get last id
 # pre: DB.json exist
-# post: return the id of the last row in the DB.json if there is at least one 
-#       row in the DB.json. Otherwise, return None.
+# post: return the max(id) in the DB.json if there is at least one row in DB.json.
+#       Otherwise, return None.
 def get_last_id(DB):
-
     rows = read_rows(DB)
-    
-    if(len(rows) == 0):
-        return 0
+    if (len(rows) == 0):
+        return None
     else:
-        return rows[-1]["id"]
+        ids = list(map(lambda row: row["id"], rows)) # extract a list of id
+        return max(ids)
 ### TEST
 # get_last_id("projects")        # 22
 # get_last_id("users")           # None
