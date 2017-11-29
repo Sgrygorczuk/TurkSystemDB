@@ -81,17 +81,90 @@ def del_row(DB, id):
 
 # 4. select rows from DB.json
 # pre: DB.json exist, "id" is the valid id format for the DB.json
-# post: returns a [{row1}] where each rows' id is "id"
-#       if no rows with the "id" exists, [] will be returned.
+# post: returns a row whose id is "id"
+#       if no row with the "id" exists, None will be returned.
 def get_row(DB, id):
     # read rows from json DB
     rows = read_rows(DB)
     
     # row with passed in 'id'
     filtered_row = list(filter(lambda item: item['id'] == id, rows))
-    return filtered_row
+    
+    if (len(filtered_row) == 0):
+        return None
+    else:
+        return filtered_row[0] # row == {"id": id, ... }
 
 ### TEST
-get_rows("projects", 22)
-get_rows("projects", 111111) # should return []
+# get_rows("projects", 22)              # {'id': 22,'clientId': 4, ... }
+# print(get_rows("projects", 111111))   # None
+############################################################################
+
+# 5. get a value that corresponds to the key from a row with the "id" in the DB.json
+# pre: DB.json exist, "id" is the valid id format for the DB.json key is a string
+# post: return a value from {... "key": value, ...} in DB.json
+def get_value(DB, id, key):
+    row = get_row(DB, id)
+    if(row == None):
+        return None
+    else:
+        try:
+            return row[key]
+        except KeyError:
+            return None
+### TEST
+# get_value("projects", 22, 'status')           # 'active'
+# print(get_value("projects", 1111, 'status'))  # None
+# print(get_value("projects", 22, 's'))         # None
+############################################################################
+
+# 6. get last id
+# pre: DB.json exist
+# post: return the id of the last row in the DB.json if there is at least one 
+#       row in the DB.json. Otherwise, return None.
+def get_last_id(DB):
+    rows = read_rows(DB)
+    if(len(rows) == 0):
+        return None
+    else:
+        return rows[-1]["id"]
+### TEST
+# get_last_id("projects")        # 22
+# get_last_id("users")           # None
+############################################################################
+
+# 7. update a row with new value for an attribute
+# pre: DB.json exist, 
+#      id, key, attribute are valid in the DB
+# post: if there is a row in DB like below, update a row of DB and return the new row
+#      {"id":id, "key":old_attribute, ... } -> {"id":id, "key":new_attribute, ... } 
+#      Otherwise, return None
+def set_row(DB, id, key, new_attribute):
+    row = get_row(DB, id)
+    if (row == None):
+        return None
+    else:
+        # validate "key"
+        if (key not in row.keys()):
+            return None
+        
+        # update a row
+        row[key] = new_attribute
+        
+        # update DB
+        del_row(DB, id)
+        rows = read_rows(DB)
+        rows.append(row)
+        
+        # update json
+        new_DB = {DB: rows}
+        with open(DB+'.json', 'w') as f:
+            json.dump(new_DB, f)
+
+        return row
+### TEST
+get_value("projects", 22, 'status')                 # 'active'
+print(set_row("projects", 22, 's', 'blacklisted'))  # None
+set_row("projects", 22, 'status', 'blacklisted')
+get_value("projects", 22, 'status')                 # 'blacklisted'
 ############################################################################
