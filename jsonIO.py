@@ -31,14 +31,18 @@ def read_rows(DB):
 ############################################################################
 
 # 2. add a row into DB.json
-# pre: DB.json exist in the same folder 
-#   new_row is a valid row in the DB.json
-# post: add the new_row into DB.json and return the new_row if all preconditions satisfies
+# pre: DB.json exist in the same folder. Otherwise it creates new DB.json
+#      new_row is a valid row in the DB.json
+# post: add the new_row into DB.json and return the new_row if all preconditions satisfies.
 #       Otherwise, return None
 def add_row(DB, new_row):
     # read rows from json DB
     rows = read_rows(DB)
-
+    
+    if rows == None: # if DB.json doesn't exist:
+        create_DB(DB)
+        rows = []
+        
     # check if the row exists   
     for item in rows:
         if item["id"] == new_row["id"]: # all our database tables has a "id" attribute
@@ -52,7 +56,6 @@ def add_row(DB, new_row):
         with open(DB+'.json', 'w') as f:
             json.dump(new_DB, f)
     return new_row
-
 ### TEST - eg. add a project into the project.json
 # project1 = {"id":11, "clientId":3, "developerId":1, "title":"project 1", "description":"testing project 1", 
 #             "startDate":11012017, "endDate":11282017, "status":"active"}
@@ -60,6 +63,7 @@ def add_row(DB, new_row):
 # project2 = {"id":22, "clientId":4, "developerId":1, "title":"project 2", "description":"testing project 2", 
 #             "startDate":10012017, "endDate":10282017, "status":"active"}
 # add_row("projects", project2)
+# add_row("new_DB", project1) # creates a new_DB.json and write project1 in there
 ############################################################################
 # 2-1. push(DB, *args)
 # pre: no rows with the id on args exist in the DB.json # DB = bidDB or taskDB
