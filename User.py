@@ -1,31 +1,32 @@
 import jsonIO
 
 #There are _user_db>SU | Customer>Temp | Registered> Client | Developer | Blacklisted
-class User_db:
+class User:
 	db = "user_db"
 	
-	def __init__(self, username = "", password = "", user_type = "", status = "", balance = 0, warning = 0,
+	def __init__(self, name= "", username = "", password = "", user_type = "", status = "", balance = 0, warning = 0,
 		resume = "", interest = "", pic = "", issue_ids = [],
 		ratings = [], team_id = 'Nan', project_ids = [], active_project = []):
 		self.id = 'Nan'
 		#might call new_user later on
-		self.new_user(self.id, username, password, user_type, status, balance, warning, resume, interest, pic, issue_ids, ratings, team_id, project_ids, active_project)
+		self.new_user(self.id, name, username, password, user_type, status, balance, warning, resume, interest, pic, issue_ids, ratings, team_id, project_ids, active_project)
 	
-	#create a new user_db
-	def new_user(self, id, username, password, user_type, status, balance, warning,
+	#create a new user in db and in class
+	def new_user(self, id, name, username, password, user_type, status, balance, warning,
 		resume="", pic="", interest="", issue_ids = [], ratings = [],
 		team_id = 'Nan', project_ids=[], active_project='Nan'):
 		self.id = jsonIO.get_last_id(self.db) + 1
 		jsonIO.add_row(self.db, self.id, username, password, self.id, user_type, status, balance, warning,
-		resume, pic, interest, issue_ids, ratings, project_ids, active_project)                   
-		self.set_all(username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, ratings, team_id, project_ids, active_project)
+		resume, pic, interest, issue_ids, ratings, team_id, project_ids, active_project)
+		self.set_all(name, username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, ratings, team_id, project_ids, active_project)
 	
-	#update user 
-	def set_all(self, username, password, user_type, status, balance, warning,
+	#create a new user in class only
+	def set_all(self, name, username, password, user_type, status, balance, warning,
 		resume="", pic="", interest="", issue_ids = [], ratings =  [],
 		team_id = 'Nan', project_ids = [], active_project = 'Nan'):
 		#userCred_db
 		self.id = id
+		self.name = name
 		self.username = username
 		self.password = password
 		#user_db
@@ -41,8 +42,8 @@ class User_db:
 		#for registered only
 		self.ratings = ratings
 		self.team_id = team_id
-		self.project_ids = project_ids #list of project Ids that has been worked or active
-		self.active_project = active_project #a single projectId
+		self.project_ids = project_ids #list of project ids that has been worked or active
+		self.active_project = active_project #a single projectid
 		
 	#will load db into the class (must at least set id) will return 1 or 0 upon success or failure respectively
 	def load_db(self, id):
@@ -56,14 +57,16 @@ class User_db:
 	#breakdown the array and load into the class
 	def dump(self, dict):
 		#self.id = dict["id"]
-			self.set_all(dict["username"], dict["password"],
+			self.set_all(dict["name"], dict["username"], dict["password"],
 			dict["user_type"], dict["status"], dict["balance"], dict["warning"],
 			dict["resume"], dict["interest"], dict["pic"], dict["issue_ids"],
 			dict["ratings"], dict["team_id"], dict["project_ids"], dict["active_project"])
 	
 	#get_ methods user
-	def get_Id(self): 
+	def get_id(self): 
 		return self.id
+	def get_name(self):
+		return self.name
 	def get_username(self): 
 		return self.username
 	def get_password(self): 
@@ -92,80 +95,84 @@ class User_db:
 		return self.active_project
 		
 	#update user_db will return 1 or 0 upon success or failure respectively
-	def set_Id(self,id):
-		jsonIO.set_(self.db, self.id, "id", self.id) #update db
+	def set_id(self,id):
+		jsonIO.set_row(self.db, self.id, "id", self.id) #update db
 		self.id = id		#update this class
 		return 1			#success
 	def set_user_type(self, user_type):
 		self.user_type = user_type
-		jsonIO.set_(self.db, self.id, "user_type", user_type)
+		jsonIO.set_row(self.db, self.id, "user_type", user_type)
 		return 1
 	def set_status(self, status):
 		self.status = status
-		jsonIO.set_(self.db, self.id, "status", status)
+		jsonIO.set_row(self.db, self.id, "status", status)
 		return 1
 		
 	#update userInfo_db
 	def deposit(self, amount):
 		self.amount += amount
-		jsonIO.set_(self.db, self.id, "balance", self.amount)
+		jsonIO.set_row(self.db, self.id, "balance", self.amount)
 		return 1
 	def withdraw(self, amount):
 		if get_balance() >= amount:
 			self.amount -= amount
-			jsonIO.set_(self.db, self.id, "balance", self.amount)
+			jsonIO.set_row(self.db, self.id, "balance", self.amount)
 			return 1
 		else:
 			return 0
 	def set_warning(self, warning):
 		self.warning = warning
-		jsonIO.set_(self.db, self.id, "warning", warning)
+		jsonIO.set_row(self.db, self.id, "warning", warning)
 		return 1
 		
 	#update userCredential_db
+	def set_name(self, name):
+		self.name = name
+		jsonIO.set_row(self.db, self.id, "name", name)
+		return 1
 	def set_username(self, username):
 		self.username = username
-		jsonIO.set_(self.db, self.id, "username", username)
+		jsonIO.set_row(self.db, self.id, "username", username)
 		return 1
 	def set_password(self, password):
 		self.password = password
-		jsonIO.set_(self.db, self.id, "password", password)
+		jsonIO.set_row(self.db, self.id, "password", password)
 		return 1
 	
 	#update userInfo
 	def set_resume(self, resume):
 		self.resume = resume
-		jsonIO.set_(self.db, self.id, "resume", resume)
+		jsonIO.set_row(self.db, self.id, "resume", resume)
 		return 1
 	def set_Pic(self, pic):
 		self.pic = pic
-		jsonIO.set_(self.db, self.id, "pic", pic)
+		jsonIO.set_row(self.db, self.id, "pic", pic)
 		return 1
 	def set_interest(self, insterest):
 		self.insterest = insterest
-		jsonIO.set_(self.db, self.id, "insterest", insterest)
+		jsonIO.set_row(self.db, self.id, "insterest", insterest)
 		return 1
 	def set_IssueNum(self, issueNum):
 		self.issueNum = issueNum
-		jsonIO.set_(self.db, self.id, "issueNum", issueNum)
+		jsonIO.set_row(self.db, self.id, "issueNum", issueNum)
 		return 1	
 	
 	#update userInfo_db
 	def set_ratings(self, ratings):
 		self.ratings = ratings
-		jsonIO.set_(self.db, self.id, "ratings", ratings)
+		jsonIO.set_row(self.db, self.id, "ratings", ratings)
 		return 1
 	def set_team_id(self, team_id):
 		self.team_id = team_id
-		jsonIO.set_(self.db, self.id, "team_id", team_id)
+		jsonIO.set_row(self.db, self.id, "team_id", team_id)
 		return 1
 	def set_project_ids(self, project_ids):
 		self.project_ids = project_ids
-		jsonIO.set_(self.db, self.id, "project_ids", project_ids)
+		jsonIO.set_row(self.db, self.id, "project_ids", project_ids)
 		return 1
 	def set_active_project(self, active_project):
 		self.active_project = active_project
-		jsonIO.set_(self.db, self.id, "active_project", active_project)
+		jsonIO.set_row(self.db, self.id, "active_project", active_project)
 		return 1
 	
 	#destructor
