@@ -1,3 +1,4 @@
+import json
 # 1.  create a json file named "DB.json"
 # pre: DB is a database name - eg. projects, users ...
 # post: "DB.json" file created on the same directory of this program
@@ -6,9 +7,9 @@ def create_DB(DB):
         json.dump({DB:[]}, f)    # {"projects": []} 
 
 ### TEST
-create_DB("projects")
-# create_DB("users")
-# create_DB("bids")
+create_DB("projects_db")
+#create_DB("users_db")
+#create_DB("teams_db")
 ############################################################################
 
 # 2-0. help function - read all rows from DB.json
@@ -17,13 +18,14 @@ create_DB("projects")
 # post: returns [{row1}, {row2}, ...] in the DB.json if DB.json exists.
 #       Otherwise, return [].
 def read_rows(DB):
-    rows = []
-    try:
-        with open(DB+'.json', 'r') as f:
-            rows = json.load(f)[DB]     # [{row1}, {row2}, ...]
-    except FileNotFoundError:
-        print("file named "+DB+".json doesn't exist in the current folder." )
-    return rows
+	rows = []
+	try:
+		with open(DB+'.json', 'r') as f:
+			if f.read():
+				rows = json.load(f)[DB]     # [{row1}, {row2}, ...]
+	except FileNotFoundError:
+		print("file named "+DB+".json doesn't exist in the current folder." )
+	return rows
 
 ### TEST
 # print(read_rows("projects")) # [{"id":11, ... },{"id":22, ...} ...]
@@ -165,7 +167,7 @@ def get_last_id(DB):
     rows = read_rows(DB)
     
     if(len(rows) == 0):
-        return None
+        return 0
     else:
         return rows[-1]["id"]
 ### TEST
