@@ -21,7 +21,7 @@ def loadDB(DB, id): pass #method not made
 #elements might be array or multiple variables of element
 #new user
 def push(DB, *args): pass #method not made
-	# == add_row(DB, row)
+	# == push(DB, *args)
 
 #Given a db, id of user, and the key within the array, modify an existing attribute
 def set(DB, id, key, attribute): pass #method not made
@@ -34,6 +34,7 @@ def get(DB, id, key): pass #method not made
 #Given a db and the key within the array, find a certain attribute from top down
 #unless it is reversed
 def find(DB, key, attribute, reversed = False): pass #method not made
+	# == get_rows(DB, key, attribute, reversed = False)
 
 #remove a whole row
 def remove(DB, id):
