@@ -22,9 +22,9 @@ class User:
 		else:
 			self.id += 1 #last+1 for new
 		self.set_all(name, username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, ratings,  project_ids, active_project)
-		if not username:
+		if username:
 			jsonIO.add_row(self.db, self.get_all())
-		
+			
 	#create a new user in class only
 	def set_all(self, name, username, password, user_type, status, balance, warning,
 		resume="", pic="", interest="", issue_ids = [], ratings =  [],

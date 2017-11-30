@@ -17,7 +17,7 @@ class Task:
 		else:
 			self.id += 1 #last+1 for new
 		self.set_all(user_id, issue_desc, resolved)
-		if user_id == 'Nan':
+		if user_id != 'Nan':
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new issue in class only

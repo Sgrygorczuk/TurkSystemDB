@@ -18,7 +18,7 @@ class Project:
 		else:
 			self.id += 1 #last+1 for new
 		self.set_all(client_id, bid_id, team_id, title, desc, start_date, end_date, status)
-		if not title:
+		if title:
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new project in class only

@@ -17,7 +17,7 @@ class Team:
 		else:
 			self.id += 1 #last+1 for new
 		self.set_all(admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
-		if not name:
+		if name:
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new team in class only

@@ -13,8 +13,8 @@ class Bid:
 	
 	#create a new bid in db and in class
 	def new_bid(self, project_id, start_date, end_date, final_bid, bid_log, status):
-		self.set_all( start_date, end_date, final_bid, bid_log, status)
-		if project_id == 'Nan':
+		self.set_all(start_date, end_date, final_bid, bid_log, status)
+		if project_id != 'Nan':
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new bid in class only
