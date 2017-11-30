@@ -16,9 +16,9 @@ create_DB("projects_db")
 # read rows from DB.json
 # pre: DB.json exists on the same directory
 # post: returns [{row1}, {row2}, ...] in the DB.json if DB.json exists.
-#       Otherwise, return [].
+#       Otherwise, return None
 def read_rows(DB):
-	rows = []
+	rows = None
 	try:
 		with open(DB+'.json', 'r') as f:
 				rows = json.load(f)[DB]     # [{row1}, {row2}, ...]
@@ -28,7 +28,7 @@ def read_rows(DB):
 
 ### TEST
 # print(read_rows("projects")) # [{"id":11, ... },{"id":22, ...} ...]
-# print(read_rows("proejct"))  # []
+# print(read_rows("proejct"))  # None
 ############################################################################
 
 # 2. add a row into DB.json
