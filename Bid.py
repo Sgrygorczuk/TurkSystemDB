@@ -82,7 +82,7 @@ class Bid:
 		jsonIO.set_row(self.db, self.id, "end_date", end_date)
 		return 1
 	#creating bid_log
-	def add_bid(self,id, bidder_id, amount, time = self.now):
+	def add_bid(self, bidder_id, amount, time = now):
 		set_bid_log(self.bid_log.append({bidder_id, amount, time}))
 		return 1
 	def set_bid_log(self, bid_log):
