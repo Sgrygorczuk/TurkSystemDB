@@ -14,6 +14,7 @@ class Bid:
 	#create a new bid in db and in class
 	def new_bid(self, project_id, start_date, end_date, final_bid, bid_log, status):
 		self.set_all(start_date, end_date, final_bid, bid_log, status)
+		#make new class if not called explicitly
 		if project_id != 'Nan':
 			jsonIO.add_row(self.db, self.get_all())
 	
@@ -27,9 +28,10 @@ class Bid:
 	
 	#will load db into the class (must at least set id) will return 1 or 0 upon success or failure respectively
 	def load_db(self, id):
-		if id != 'Nan':
+		array = jsonIO.get_row(self.db, id)
+		if array:
 			self.id = id
-			self.dump(jsonIO.load_db(self.db, id))
+			self.dump(array)
 			return 1
 		else:
 			return 0

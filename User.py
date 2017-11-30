@@ -15,14 +15,15 @@ class User:
 	def new_user(self, id, name, username, password, user_type, status, balance, warning,
 		resume="", pic="", interest="", issue_ids = [], ratings = [],
 		project_ids=[], active_project='Nan'):
-		self.id = jsonIO.get_last_id(self.db)
-		#if no ids made
-		if self.id == None:
-			self.id = 0
-		else:
-			self.id += 1 #last+1 for new
 		self.set_all(name, username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, ratings,  project_ids, active_project)
+		#make new class if not called explicitly
 		if username:
+			self.id = jsonIO.get_last_id(self.db)
+			#if no ids made
+			if self.id == None:
+				self.id = 0
+			else:
+				self.id += 1 #last+1 for new
 			jsonIO.add_row(self.db, self.get_all())
 			
 	#create a new user in class only
@@ -50,9 +51,10 @@ class User:
 		
 	#will load db into the class (must at least set id) will return 1 or 0 upon success or failure respectively
 	def load_db(self, id):
-		if self.id != 'Nan':
+		array = jsonIO.get_row(self.db, id)
+		if array:
 			self.id = id
-			self.dump(jsonIO.get_row(self.db, id))
+			self.dump(array)
 			return 1
 		else:
 			return 0
@@ -87,7 +89,7 @@ class User:
 		return self.resume
 	def get_interest(self): 
 		return self.interest
-	def set_issue_ids(self): 
+	def get_issue_ids(self): 
 		return self.issue_ids
 	#get_ methods for registered only
 	def get_project_ids(self): 

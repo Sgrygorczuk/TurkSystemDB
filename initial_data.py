@@ -3,7 +3,7 @@ from Project import *
 from Team import *
 from Bid import *
 from Task import *
-import ezcommands
+import ezcommands as ez
 from datetime import datetime
 
 

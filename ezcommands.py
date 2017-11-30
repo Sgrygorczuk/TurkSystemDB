@@ -31,17 +31,24 @@ import numpy
 #	   else return None
 #ex: get_item(User(), "name", 0)
 #	 returns: System Admit
+#**************************************************not working with just obj & key
 def get_item(obj, key, id = 'Nan'):
 	if id == 'Nan':
 		id = obj.get_id()
+		if not key:
+			print("Key not stated")
+			return None
 		if id == 'Nan':
 			print("ID not initialized")
 			return None
 		else:
 			#can pull from user
-			method = getattr(obj, 'get_'+key)
-			return obj.method()
+			method = 'get_'+key+'()'
+			method = getattr(obj, method)
+			print(method)
+			return obj.method
 	#otherwise just search db
+	print(1)
 	return jsonIO.get_value(obj.db, id, key)
 	
 #post: returns all items in a database
@@ -60,11 +67,15 @@ def get_row(obj, id = 'Nan'):
 		else:
 			#can pull from user
 			return obj.get_all()
+	elif isinstance(id, str):
+		print("ID does not exits")
+		return None
 	#otherwise just search db
-	return jsonIO.get_row(DB, id)
+	return jsonIO.get_row(obj.db, id)
 	
 #pre: needs valid instance of class and its key
 #pro: returns the whole column of an attribute
+#******************************************************not tested from here down
 def get_col(obj, key):
 	array = []
 	#don't include SU (id = 0)

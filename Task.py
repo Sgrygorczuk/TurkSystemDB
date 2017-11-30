@@ -10,14 +10,15 @@ class Task:
 		
 	#create a new issue in db and in class
 	def new_issue(self, user_id, issue_desc, resolved): 
-		self.id = jsonIO.get_last_id(self.db)
-		#if no ids made
-		if self.id == None:
-			self.id = 0
-		else:
-			self.id += 1 #last+1 for new
 		self.set_all(user_id, issue_desc, resolved)
+		#make new class if not called explicitly
 		if user_id != 'Nan':
+			self.id = jsonIO.get_last_id(self.db)
+			#if no ids made
+			if self.id == None:
+				self.id = 0
+			else:
+				self.id += 1 #last+1 for new
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new issue in class only
@@ -28,9 +29,10 @@ class Task:
 	
 	#will load db into the class (must at least set id) will return 1 or 0 upon success or failure respectively
 	def load_db(self, id):
-		if id != 'Nan':
-			self.issued_id = issued_id
-			self.dump(jsonIO.load_db(self.db,id))
+		array = jsonIO.get_row(self.db, id)
+		if array:
+			self.id = id
+			self.dump(array)
 			return 1
 		else:
 			return 0

@@ -10,15 +10,16 @@ class Project:
 
 	#create a new project in db and in class
 	def new_project(self, client_id, bid_id, team_id, title, desc, start_date, end_date, status):
-		self.id = jsonIO.get_last_id(self.db)
-		#if no ids were made
-				#if no ids made
-		if self.id == None:
-			self.id = 0
-		else:
-			self.id += 1 #last+1 for new
 		self.set_all(client_id, bid_id, team_id, title, desc, start_date, end_date, status)
+		#make new class if not called explicitly
 		if title:
+			self.id = jsonIO.get_last_id(self.db)
+			#if no ids were made
+					#if no ids made
+			if self.id == None:
+				self.id = 0
+			else:
+				self.id += 1 #last+1 for new
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new project in class only
@@ -34,9 +35,10 @@ class Project:
 		
 	#will load db into the class (must at least set id) will return 1 or 0 upon success or failure respectively
 	def load_db(self, id):
-		if id != 'Nan':
+		array = jsonIO.get_row(self.db, id)
+		if array:
 			self.id = id
-			self.dump(jsonIO.get_row(self.db, id))
+			self.dump(array)
 			return 1
 		else:
 			return 0
