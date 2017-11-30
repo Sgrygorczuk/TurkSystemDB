@@ -6,7 +6,8 @@ from Task import *
 import ezcommands
 from datetime import datetime
 
-now = datetime.now()
+
+now = str(datetime.now())
 
 super_user = User(name = "System Admin", username = "admin", password = "pass", user_type = "admin")
 user1 = User(name = "Johnny Boy", username = "eats", password = "Dog", user_type = "developer")

@@ -10,9 +10,12 @@ class Task:
 		
 	#create a new issue in db and in class
 	def new_issue(self, user_id, issue_desc, resolved): 
-		self.id = jsonIO.get_last_id(self.db) + 1 #last+1 for new
-		jsonIO.push(self.db, self.id, user_id, issue_desc, resolved)
+		self.id = jsonIO.get_last_id(self.db)
+		#if no ids were made
+		if self.id != 0:
+			self.id += 1 #last+1 for new
 		self.set_all(user_id, issue_desc, resolved)
+		jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new issue in class only
 	def set_all(self, user_id, issue_desc, resolved):
@@ -45,6 +48,8 @@ class Task:
 		return self.resolved
 	def get_next_issue(self):
 		return jsonIO.find_id(self.db, "resovled", False)
+	def get_all(self):
+		return {"id":self.id, "user_id":self.user_id, "issue_desc":self.issue_desc, "resolved":self.resolved}
 	
 	#update bid_db
 	def set_id(self, id):

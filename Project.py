@@ -10,9 +10,12 @@ class Project:
 
 	#create a new project in db and in class
 	def new_project(self, client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status):
-		self.id = jsonIO.get_last_id(self.db) + 1 #last+1 for new
-		jsonIO.push(self.db, self.id, client_id, team_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status)
+		self.id = jsonIO.get_last_id(self.db)
+		#if no ids were made
+		if self.id != 0:
+			self.id += 1 #last+1 for new
 		self.set_all(client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status)
+		jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new project in class only
 	def set_all(self, client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status):
@@ -61,7 +64,10 @@ class Project:
 		return self.end_date
 	def get_status(self): 
 		return self.status
-
+	def get_all(self):
+		return {"id":self.id, "client_id":self.client_id, "bid_id":self.bid_id, "team_id":self.team_id, "dev_ids":self.dev_ids,
+		"title":self.title, "desc":self.desc, "start_date":self.start_date, "end_date":self.end_date, "status":self.status}
+	
 	#update project_db
 	def set_client_id(self, client_id):
 		self.client_id = client_id

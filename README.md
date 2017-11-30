@@ -14,7 +14,7 @@ You might need NumPy to run this.
 
 * **Eun Il Kim** - *Initial work* - [eunik](https://bitbucket.org/eunik/)
 
-* **Eun Jung Park** - *Essential modifications and file additions* - [eunjung2059] (https://bitbucket.org/eunjung2059/)
+* **Eun Jung Park** - *Essential modifications and file additions* - [eunjung2059](https://bitbucket.org/eunjung2059/)
 
 ## Acknowledgments
 

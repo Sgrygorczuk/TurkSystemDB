@@ -10,9 +10,12 @@ class Bid:
 	
 	#create a new bid in db and in class
 	def new_bid(self, client_id, project_id, start_date, end_date, bid_log, status):
-		self.id = jsonIO.get_last_id(self.db) + 1 #last+1 for new
-		jsonIO.push(self.db, self.id, client_id, project_id, start_date, end_date, bid_log)
+		self.id = jsonIO.get_last_id(self.db)
+		#if no ids were made
+		if self.id != 0:
+			self.id += 1 #last+1 for new
 		self.set_all(client_id, project_id, start_date, end_date, bid_log, status)
+		jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new bid in class only
 	def set_all(self, client_id, project_id, start_date, end_date, bid_log, status):
@@ -52,6 +55,8 @@ class Bid:
 		return self.bid_log
 	def get_status(self): 
 		return self.status
+	def get_all(self):
+		return {"id":self.id, "client_id":self.client_id, "start_date":self.start_date, "end_date":self.end_date, "bid_log":self.bid_log, "status":self.status}
 
 	#update bid_db
 	def set_id(self, id):

@@ -10,9 +10,12 @@ class Team:
 
 	#create a new team in db and in class
 	def new_team(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status):
-		self.id = jsonIO.get_last_id(self.db) + 1 #last+1 for new
-		jsonIO.push(self.db, self.id, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
+		self.id = jsonIO.get_last_id(self.db)
+		#if no ids were made
+		if self.id != 0:
+			self.id += 1 #last+1 for new
 		self.set_all(admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
+		jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new team in class only
 	def set_all(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status):
@@ -20,6 +23,7 @@ class Team:
 		self.dev_ids = dev_ids
 		self.name = name
 		self.pic = pic
+		self.desc = desc
 		self.project_ids = project_ids
 		self.active_project = active_project
 		self.status = status
@@ -57,7 +61,10 @@ class Team:
 		return self.active_project
 	def get_status(self): 
 		return self.status
-
+	def get_all(self):
+		return {"id":self.id, "admin_ids":self.admin_ids, "dev_ids":self.dev_ids, "name":self.name, "pic":self.pic, "desc":self.desc,
+		"project_ids":self.project_ids, "active_project":self.active_project, "status":self.status}
+	
 	#update project_db
 	def set_id(self, id): 
 		jsonIO.set_row(self.db, self.id, "id", id)

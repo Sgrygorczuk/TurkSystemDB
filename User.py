@@ -15,17 +15,18 @@ class User:
 	def new_user(self, id, name, username, password, user_type, status, balance, warning,
 		resume="", pic="", interest="", issue_ids = [], ratings = [],
 		team_id = 'Nan', project_ids=[], active_project='Nan'):
-		self.id = jsonIO.get_last_id(self.db) + 1
-		jsonIO.push(self.db, self.id, username, password, self.id, user_type, status, balance, warning,
-		resume, pic, interest, issue_ids, ratings, team_id, project_ids, active_project)
+		self.id = jsonIO.get_last_id(self.db)
+		#if not SU and/or no ids made
+		if self.id != 0:
+			self.id += 1 #last+1 for new
 		self.set_all(name, username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, ratings, team_id, project_ids, active_project)
-	
+		jsonIO.add_row(self.db, self.get_all())
+		
 	#create a new user in class only
 	def set_all(self, name, username, password, user_type, status, balance, warning,
 		resume="", pic="", interest="", issue_ids = [], ratings =  [],
 		team_id = 'Nan', project_ids = [], active_project = 'Nan'):
 		#userCred_db
-		self.id = id
 		self.name = name
 		self.username = username
 		self.password = password
@@ -93,6 +94,11 @@ class User:
 		return self.project_ids
 	def get_active_project(self): 
 		return self.active_project
+	def get_all(self):
+		return {"id":self.id, "name":self.name, "username":self.username, "password":self.password,
+		"user_type":self.user_type, "status":self.status, "balance":self.balance, "warning":self.balance,
+		"resume":self.resume, "pic":self.pic, "interest":self.interest, "issue_ids":self.issue_ids,
+		"ratings":self.ratings, "team_id":self.team_id, "project_ids":self.project_ids, "active_project":self.project_ids}
 		
 	#update user_db will return 1 or 0 upon success or failure respectively
 	def set_id(self,id):
