@@ -3,22 +3,28 @@ from Project import *
 from Team import *
 from Bid import *
 from Task import *
+from jsonIO import *
+import inspect
 import numpy
 
 ##############################################################################
 ##############################################################################
 #NOTES:
 #
-#use this functions to ensure your classes are connected to essentials classes
-#also to make sure no duplicates and blacklisted user/project/bid... so forth
-#aren't created.
+#Use this functions to ensure that the creation of your classes does not
+#conflict with other classes, all the other classes are updated if they share
+#the same key.
+#This will also makes sure that there no duplicates and blacklisted
+#user/project/bid... so forth are created.
+#Finally this class will aid in other calculations.
 
 ##############################################################################
 ##############################################################################
 #all classes
-#get attribute given id and keys
-def get_attribute():
-	pass
+#get attribute from a given an instance of a class, id and key
+#ex: get
+def get_attribute(obj, id, key):
+	return jsonIO.get_value(obj, id, key)
 	
 #prints table of all DB
 def print_all(DB):
@@ -51,7 +57,13 @@ def start_project():
 #takes required feature for a bid and initiates a bid
 def start_bid():
 	pass	
-	
+
+	#from,to,amount
+def tranfer_funcs(from_user, to_user, amount):
+	pass
+
+##################################################################################
+#metrics
 def calc_avg_rating(object):
 	ratings = []
 	if object.__class__ == Team:
@@ -61,10 +73,4 @@ def calc_avg_rating(object):
 	else:
 		ratings = object.get_ratings()
 	return max(numpy.mean(), 1)
-
-	#from,to,amount
-def tranfer_funcs(from_user, to_user, amount):
-	pass
-
-
  

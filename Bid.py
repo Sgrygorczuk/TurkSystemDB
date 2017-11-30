@@ -11,7 +11,7 @@ class Bid:
 	#create a new bid in db and in class
 	def new_bid(self, client_id, project_id, start_date, end_date, bid_log, status):
 		self.id = jsonIO.get_last_id(self.db) + 1 #last+1 for new
-		jsonIO.add_row(self.db, self.id, client_id, project_id, start_date, end_date, bid_log)
+		jsonIO.push(self.db, self.id, client_id, project_id, start_date, end_date, bid_log)
 		self.set_all(client_id, project_id, start_date, end_date, bid_log, status)
 	
 	#create a new bid in class only

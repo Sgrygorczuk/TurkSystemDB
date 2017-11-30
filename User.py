@@ -16,7 +16,7 @@ class User:
 		resume="", pic="", interest="", issue_ids = [], ratings = [],
 		team_id = 'Nan', project_ids=[], active_project='Nan'):
 		self.id = jsonIO.get_last_id(self.db) + 1
-		jsonIO.add_row(self.db, self.id, username, password, self.id, user_type, status, balance, warning,
+		jsonIO.push(self.db, self.id, username, password, self.id, user_type, status, balance, warning,
 		resume, pic, interest, issue_ids, ratings, team_id, project_ids, active_project)
 		self.set_all(name, username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, ratings, team_id, project_ids, active_project)
 	

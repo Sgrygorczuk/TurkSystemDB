@@ -11,7 +11,7 @@ class Task:
 	#create a new issue in db and in class
 	def new_issue(self, user_id, issue_desc, resolved): 
 		self.id = jsonIO.get_last_id(self.db) + 1 #last+1 for new
-		jsonIO.add_row(self.db, self.id, user_id, issue_desc, resolved)
+		jsonIO.push(self.db, self.id, user_id, issue_desc, resolved)
 		self.set_all(user_id, issue_desc, resolved)
 	
 	#create a new issue in class only

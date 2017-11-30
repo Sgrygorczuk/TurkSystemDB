@@ -11,7 +11,7 @@ class Project:
 	#create a new project in db and in class
 	def new_project(self, client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status):
 		self.id = jsonIO.get_last_id(self.db) + 1 #last+1 for new
-		jsonIO.add_row(self.db, self.id, client_id, team_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status)
+		jsonIO.push(self.db, self.id, client_id, team_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status)
 		self.set_all(client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status)
 	
 	#create a new project in class only

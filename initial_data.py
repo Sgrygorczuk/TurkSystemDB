@@ -4,8 +4,11 @@ from Team import *
 from Bid import *
 from Task import *
 import ezcommands
-import datetime 
+from datetime import datetime
 
+now = datetime.now()
+
+super_user = User(name = "System Admin", username = "admin", password = "pass", user_type = "admin")
 user1 = User(name = "Johnny Boy", username = "eats", password = "Dog", user_type = "developer")
 user2 = User(name = "Jane Doe", username = "isa", password = 'cat', user_type = "developer")
 user3 = User(name = "Cow", username = "can", password = 'code?', user_type = "developer")

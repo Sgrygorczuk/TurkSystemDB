@@ -11,7 +11,7 @@ class Team:
 	#create a new team in db and in class
 	def new_team(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status):
 		self.id = jsonIO.get_last_id(self.db) + 1 #last+1 for new
-		jsonIO.add_row(self.db, self.id, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
+		jsonIO.push(self.db, self.id, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
 		self.set_all(admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
 	
 	#create a new team in class only
