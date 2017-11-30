@@ -163,7 +163,7 @@ def get_value(DB, id, key):
 #       Otherwise, return 0.
 def get_last_id(DB):
     rows = read_rows(DB)
-    if (len(rows) == 0):
+    if (rows == None or len(rows) == 0):
         return 0
     else:
         ids = list(map(lambda row: row["id"], rows)) # extract a list of id
