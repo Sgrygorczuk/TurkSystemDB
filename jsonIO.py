@@ -169,25 +169,25 @@ def set_row(DB, id, key, new_value):
     row = get_row(DB, id)
     if (row == None):
         return None
-    else:
-        # validate "key"
-        if (key not in row.keys()):
-            return None
         
-        # update a row
-        row[key] = new_value
+    # validate "key"
+    if (key not in row.keys()):
+        return None
+    
+    # update a row
+    row[key] = new_value
+    
+    # update DB
+    del_row(DB, id)
+    rows = read_rows(DB)
+    rows.append(row)
+    
+    # update json
+    new_DB = {DB: rows}
+    with open(DB+'.json', 'w') as f:
+        json.dump(new_DB, f)
         
-        # update DB
-        del_row(DB, id)
-        rows = read_rows(DB)
-        rows.append(row)
-        
-        # update json
-        new_DB = {DB: rows}
-        with open(DB+'.json', 'w') as f:
-            json.dump(new_DB, f)
-            
-        return row
+    return row
 ### TEST
 # get_value("project_db", 22, 'status')                 # 'active'
 # print(set_row("project_db", 22, 's', 'blacklisted'))  # None
