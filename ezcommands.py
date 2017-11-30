@@ -68,7 +68,10 @@ def get_row(obj, id = 'Nan'):
 def get_col(obj, key):
 	array = []
 	#don't include SU (id = 0)
-	for id in range(1, jsonIO.get_last_id):
+	n = 0
+	if obj.__class__ == User:
+		n += 1
+	for id in range(n, jsonIO.get_last_id(obj.db)):
 		attrib = jsonIO.get_value(obj.db, id, key)
 		#if it exist
 		if attrib!= None:
@@ -111,11 +114,13 @@ def user_report(user, id = 'Nan'):
 			return None
 		else:
 			#can pull from user
-			return {"user_type":user.get_user_type(), "status":user.get_status(), "warning":user.get_warning(), "balance":user.get_balance()}
+			return {"user_type":user.get_user_type(), "status":user.get_status(),
+			"warning":user.get_warning(), "balance":user.get_balance()}
 	obj = jsonIO.get_row(user.db, id)
 	if obj == None:
 		return None
-	return {"user_type":obj["user_type"], "status":obj["status"], "warning":obj["warning"], "balance":obj["balance"]}
+	return {"user_type":obj["user_type"], "status":obj["status"],
+	"warning":obj["warning"], "balance":obj["balance"]}
 
 #authenticate user
 #cond: will autheticate user: username or username and password for logging in

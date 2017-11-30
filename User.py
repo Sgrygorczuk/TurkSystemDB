@@ -6,26 +6,29 @@ class User:
 	
 	def __init__(self, name= "", username = "", password = "", user_type = "", status = "", balance = 0, warning = 0,
 		resume = "", interest = "", pic = "", issue_ids = [],
-		ratings = [], team_id = 'Nan', project_ids = [], active_project = 'Nan'):
+		ratings = [], project_ids = [], active_project = 'Nan'):
 		self.id = 'Nan'
 		#might call new_user later on
-		self.new_user(self.id, name, username, password, user_type, status, balance, warning, resume, interest, pic, issue_ids, ratings, team_id, project_ids, active_project)
+		self.new_user(self.id, name, username, password, user_type, status, balance, warning, resume, interest, pic, issue_ids, ratings,  project_ids, active_project)
 	
 	#create a new user in db and in class
 	def new_user(self, id, name, username, password, user_type, status, balance, warning,
 		resume="", pic="", interest="", issue_ids = [], ratings = [],
-		team_id = 'Nan', project_ids=[], active_project='Nan'):
+		project_ids=[], active_project='Nan'):
 		self.id = jsonIO.get_last_id(self.db)
-		#if not SU and/or no ids made
-		if self.id != 0:
+		#if no ids made
+		if self.id == None:
+			self.id = 0
+		else:
 			self.id += 1 #last+1 for new
-		self.set_all(name, username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, ratings, team_id, project_ids, active_project)
-		jsonIO.add_row(self.db, self.get_all())
+		self.set_all(name, username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, ratings,  project_ids, active_project)
+		if not username:
+			jsonIO.add_row(self.db, self.get_all())
 		
 	#create a new user in class only
 	def set_all(self, name, username, password, user_type, status, balance, warning,
 		resume="", pic="", interest="", issue_ids = [], ratings =  [],
-		team_id = 'Nan', project_ids = [], active_project = 'Nan'):
+		project_ids = [], active_project = 'Nan'):
 		#userCred_db
 		self.name = name
 		self.username = username
@@ -42,7 +45,6 @@ class User:
 		self.issue_ids = issue_ids
 		#for registered only
 		self.ratings = ratings
-		self.team_id = team_id
 		self.project_ids = project_ids #list of project ids that has been worked or active
 		self.active_project = active_project #a single projectid
 		
@@ -61,7 +63,7 @@ class User:
 			self.set_all(dict["name"], dict["username"], dict["password"],
 			dict["user_type"], dict["status"], dict["balance"], dict["warning"],
 			dict["resume"], dict["interest"], dict["pic"], dict["issue_ids"],
-			dict["ratings"], dict["team_id"], dict["project_ids"], dict["active_project"])
+			dict["ratings"], dict["project_ids"], dict["active_project"])
 	
 	#get_ methods user
 	def get_id(self): 
@@ -88,8 +90,6 @@ class User:
 	def set_issue_ids(self): 
 		return self.issue_ids
 	#get_ methods for registered only
-	def get_team_id(self):
-		return self.team_id
 	def get_project_ids(self): 
 		return self.project_ids
 	def get_active_project(self): 
@@ -98,7 +98,7 @@ class User:
 		return {"id":self.id, "name":self.name, "username":self.username, "password":self.password,
 		"user_type":self.user_type, "status":self.status, "balance":self.balance, "warning":self.balance,
 		"resume":self.resume, "pic":self.pic, "interest":self.interest, "issue_ids":self.issue_ids,
-		"ratings":self.ratings, "team_id":self.team_id, "project_ids":self.project_ids, "active_project":self.project_ids}
+		"ratings":self.ratings, "project_ids":self.project_ids, "active_project":self.project_ids}
 		
 	#update user_db will return 1 or 0 upon success or failure respectively
 	def set_id(self,id):
@@ -173,10 +173,6 @@ class User:
 	def set_ratings(self, ratings):
 		self.ratings = ratings[:]
 		jsonIO.set_row(self.db, self.id, "ratings", ratings)
-		return 1
-	def set_team_id(self, team_id):
-		self.team_id = team_id
-		jsonIO.set_row(self.db, self.id, "team_id", team_id)
 		return 1
 	def add_project_ids(self, project_id):
 		set_project_ids(self.project_ids.append(project_id))

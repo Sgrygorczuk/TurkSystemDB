@@ -11,11 +11,14 @@ class Task:
 	#create a new issue in db and in class
 	def new_issue(self, user_id, issue_desc, resolved): 
 		self.id = jsonIO.get_last_id(self.db)
-		#if no ids were made
-		if self.id != 0:
+		#if no ids made
+		if self.id == None:
+			self.id = 0
+		else:
 			self.id += 1 #last+1 for new
 		self.set_all(user_id, issue_desc, resolved)
-		jsonIO.add_row(self.db, self.get_all())
+		if user_id == 'Nan':
+			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new issue in class only
 	def set_all(self, user_id, issue_desc, resolved):

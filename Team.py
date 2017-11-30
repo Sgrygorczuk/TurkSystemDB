@@ -11,11 +11,14 @@ class Team:
 	#create a new team in db and in class
 	def new_team(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status):
 		self.id = jsonIO.get_last_id(self.db)
-		#if no ids were made
-		if self.id != 0:
+		#if no ids made
+		if self.id == None:
+			self.id = 0
+		else:
 			self.id += 1 #last+1 for new
 		self.set_all(admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
-		jsonIO.add_row(self.db, self.get_all())
+		if not name:
+			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new team in class only
 	def set_all(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status):

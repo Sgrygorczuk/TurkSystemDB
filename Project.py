@@ -3,26 +3,29 @@ import jsonIO
 class Project:
 	db = "project_db"
 	
-	def __init__(self, client_id='Nan', bid_id='Nan', team_id = 'Nan', dev_ids=[], title="", desc="", start_date=0, end_date=0, status="active"):
+	def __init__(self, client_id='Nan', bid_id='Nan', team_id = 'Nan', title="", desc="", start_date=0, end_date=0, status="active"):
 		self.id = 'Nan'
 		#might call new_project later on
-		self.new_project(client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status)
+		self.new_project(client_id, bid_id, team_id, title, desc, start_date, end_date, status)
 
 	#create a new project in db and in class
-	def new_project(self, client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status):
+	def new_project(self, client_id, bid_id, team_id, title, desc, start_date, end_date, status):
 		self.id = jsonIO.get_last_id(self.db)
 		#if no ids were made
-		if self.id != 0:
+				#if no ids made
+		if self.id == None:
+			self.id = 0
+		else:
 			self.id += 1 #last+1 for new
-		self.set_all(client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status)
-		jsonIO.add_row(self.db, self.get_all())
+		self.set_all(client_id, bid_id, team_id, title, desc, start_date, end_date, status)
+		if not title:
+			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new project in class only
-	def set_all(self, client_id, bid_id, team_id, dev_ids, title, desc, start_date, end_date, status):
+	def set_all(self, client_id, bid_id, team_id, title, desc, start_date, end_date, status):
 		self.client_id = client_id
 		self.bid_id = bid_id
 		self.team_id = team_id
-		self.dev_ids = dev_ids
 		self.title = title
 		self.desc = desc
 		self.start_date = start_date
@@ -41,7 +44,7 @@ class Project:
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
 		#self.id = dict["id"]
-		self.set_all(dict["client_id"], dict["bid_id"], dict["team_id"], dict["dev_ids"], dict["title"], dict["desc"], dict["start_date"], dict["end_date"], dict["status"])
+		self.set_all(dict["client_id"], dict["bid_id"], dict["team_id"], dict["title"], dict["desc"], dict["start_date"], dict["end_date"], dict["status"])
 		
 	#get_ methods
 	def get_id(self): 
@@ -52,8 +55,6 @@ class Project:
 		return self.bid_id
 	def get_team_id(self): 
 		return self.team_id
-	def get_dev_ids(self): 
-		return self.dev_ids #one or more
 	def get_title(self): 
 		return self.title
 	def get_desc(self): 
@@ -65,7 +66,7 @@ class Project:
 	def get_status(self): 
 		return self.status
 	def get_all(self):
-		return {"id":self.id, "client_id":self.client_id, "bid_id":self.bid_id, "team_id":self.team_id, "dev_ids":self.dev_ids,
+		return {"id":self.id, "client_id":self.client_id, "bid_id":self.bid_id, "team_id":self.team_id,
 		"title":self.title, "desc":self.desc, "start_date":self.start_date, "end_date":self.end_date, "status":self.status}
 	
 	#update project_db
@@ -80,13 +81,6 @@ class Project:
 	def set_team_id(self, team_id):
 		self.team_id = team_id
 		jsonIO.set_row(self.db, self.id, "team_id", team_id)
-		return 1
-	def add_dev_ids(self, dev_id):
-		set_dev_ids(self.dev_ids.append(dev_id))
-		return 1
-	def set_dev_ids(self, dev_ids):
-		self.dev_ids = dev_ids[:]
-		jsonIO.set_row(self.db, self.id, "dev_ids", dev_ids)
 		return 1
 	def set_title(self, title):
 		self.title = title

@@ -29,7 +29,7 @@ project2 = Project(client_id = client2.get_id(), title = "World", desc = "I have
 project3 = Project(client_id = client3.get_id(), title = "Goodbye", desc = "I have more money than the other guy", team_id = t3.get_id(), bid_id = now, start_date = now, end_date = now)
 project4 = Project(client_id = client4.get_id(), title = "VR", desc = "Don't listen to any of them, I have the most", bid_id = now, start_date = now, end_date = now)
 
-bid1 = Bid(client_id = client1.get_id(),project_id = project1.get_id(), start_date = now, end_date=now)
-bid2 = Bid(client_id = client2.get_id(),project_id = project2.get_id(), start_date = now, end_date=now)
-bid3 = Bid(client_id = client3.get_id(),project_id = project3.get_id(), start_date = now, end_date=now)
-bid4 = Bid(client_id = client4.get_id(),project_id = project4.get_id(), start_date = now, end_date=now)
+bid1 = Bid(project_id = project1.get_id(), start_date = now, end_date=now)
+bid2 = Bid(project_id = project2.get_id(), start_date = now, end_date=now)
+bid3 = Bid(project_id = project3.get_id(), start_date = now, end_date=now)
+bid4 = Bid(project_id = project4.get_id(), start_date = now, end_date=now)
