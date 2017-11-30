@@ -6,7 +6,7 @@ class User:
 	
 	def __init__(self, name= "", username = "", password = "", user_type = "", status = "", balance = 0, warning = 0,
 		resume = "", interest = "", pic = "", issue_ids = [],
-		ratings = [], team_id = 'Nan', project_ids = [], active_project = []):
+		ratings = [], team_id = 'Nan', project_ids = [], active_project = 'Nan'):
 		self.id = 'Nan'
 		#might call new_user later on
 		self.new_user(self.id, name, username, password, user_type, status, balance, warning, resume, interest, pic, issue_ids, ratings, team_id, project_ids, active_project)
@@ -158,22 +158,31 @@ class User:
 		self.insterest = insterest
 		jsonIO.set_row(self.db, self.id, "insterest", insterest)
 		return 1
-	def set_IssueNum(self, issueNum):
-		self.issueNum = issueNum
-		jsonIO.set_row(self.db, self.id, "issueNum", issueNum)
+	def add_issue_ids(self, issue_id):
+		set_Issue_ids(self.issue_ids.append(issue_id))
+		return 1
+	def set_Issue_ids(self, issue_ids):
+		self.issue_ids = issue_ids[:]
+		jsonIO.set_row(self.db, self.id, "issue_ids", issue_ids)
 		return 1	
 	
 	#update userInfo_db
+	def add_ratings(self, rating):
+		set_ratings(self.ratings.append(rating))
+		return 1
 	def set_ratings(self, ratings):
-		self.ratings = ratings
+		self.ratings = ratings[:]
 		jsonIO.set_row(self.db, self.id, "ratings", ratings)
 		return 1
 	def set_team_id(self, team_id):
 		self.team_id = team_id
 		jsonIO.set_row(self.db, self.id, "team_id", team_id)
 		return 1
+	def add_project_ids(self, project_id):
+		set_project_ids(self.project_ids.append(project_id))
+		return 1
 	def set_project_ids(self, project_ids):
-		self.project_ids = project_ids
+		self.project_ids = project_ids[:]
 		jsonIO.set_row(self.db, self.id, "project_ids", project_ids)
 		return 1
 	def set_active_project(self, active_project):
@@ -186,4 +195,4 @@ class User:
 		jsonIO.del_row(self.db, self.self)
 		print (self.id, ' was destroyed.')
 		del self
-		return 1;
+		return 1

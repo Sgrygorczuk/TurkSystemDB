@@ -69,43 +69,52 @@ class Team:
 	def set_id(self, id): 
 		jsonIO.set_row(self.db, self.id, "id", id)
 		self.id = id
-		return 1;
+		return 1
+	def add_admin_ids(self, admin_id):
+		set_admin_ids(self.admin_ids.append(admin_id))
+		return 1
 	def set_admin_ids(self, admin_ids): 
-		self.admin_ids = admin_ids
+		self.admin_ids = admin_ids[:]
 		jsonIO.set_row(self.db, self.id, "admin_ids", admin_ids)
-		return 1;
-	def get_dev_ids(self, dev_ids): 
-		self.dev_ids = dev_ids
+		return 1
+	def add_dev_ids(self, dev_id):
+		set_dev_ids(self.dev_ids.append(dev_id))
+		return 1
+	def set_dev_ids(self, dev_ids): 
+		self.dev_ids = dev_ids[:]
 		jsonIO.set_row(self.db, self.id, "dev_ids", dev_ids)
-		return 1;
-	def get_name(self, name): 
+		return 1
+	def set_name(self, name): 
 		self.name = name
 		jsonIO.set_row(self.db, self.id, "name", name)
-		return 1;
-	def get_pic(self, pic): 
+		return 1
+	def set_pic(self, pic): 
 		self.pic = pic
 		jsonIO.set_row(self.db, self.id, "pic", pic)
-		return 1;
-	def get_desc(self, desc): 
+		return 1
+	def set_desc(self, desc): 
 		self.desc = desc
 		jsonIO.set_row(self.db, self.id, "desc", desc)
-		return 1;
-	def get_project_ids(self, project_ids):
-		self.project_ids = project_ids
+		return 1
+	def add_project_ids(self, project_id):
+		set_project_ids(self.project_ids.append(project_id))
+		return 1
+	def set_project_ids(self, project_ids):
+		self.project_ids = project_ids[:]
 		jsonIO.set_row(self.db, self.id, "project_ids", project_ids)
-		return 1;
-	def get_active_project(self, active_project): 
+		return 1
+	def set_active_project(self, active_project): 
 		self.active_project = active_project
 		jsonIO.set_row(self.db, self.id, "active_project", active_project)
-		return 1;
-	def get_status(self, active_project): 
+		return 1
+	def set_status(self, active_project): 
 		self.active_project = active_project
 		jsonIO.set_row(self.db, self.project_id, "active_project", active_project)
-		return 1;
+		return 1
 		
 	#destructor
 	def remove(self):
 		jsonIO.del_row(self.db, self.id)
 		print (self.id, ' was destroyed.')
 		del self
-		return 1;
+		return 1

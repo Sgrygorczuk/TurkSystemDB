@@ -1,7 +1,9 @@
 import jsonIO
+from datetime import datetime
 
 class Bid:
 	db = "bid_db"
+	now = str(datetime.now())
 	
 	def __init__(self, client_id = 'Nan' , project_id = 'Nan', start_date = 0, end_date = 0, bid_log = [[] for i in range(3)], status = "active"):
 		self.id = 'Nan'
@@ -62,35 +64,39 @@ class Bid:
 	def set_id(self, id):
 		jsonIO.set_row(self.db, self.id, "id", id)
 		self.id = id
-		return 1;
+		return 1
 	def set_client_id(self, client_id):
 		self.client_id = client_id
 		jsonIO.set_row(self.db, self.id, "client_id", client_id)
-		return 1;
+		return 1
 	def set_project_id(self, project_id):
 		self.project_id = project_id
 		jsonIO.set_row(self.db, self.id, "project_id", project_id)
-		return 1;
+		return 1
 	def set_start_date(self, start_date):
 		self.start_date = start_date
 		jsonIO.set_row(self.db, self.id, "start_date", start_date)
-		return 1;
+		return 1
 	def set_end_date(self, end_date):
 		self.end_date = end_date
 		jsonIO.set_row(self.db, self.id, "end_date", end_date)
-		return 1;
+		return 1
+	#creating bid_log
+	def add_bid(self,id, bidder_id, amount, time = self.now):
+		set_bid_log(self.bid_log.append({bidder_id, amount, time}))
+		return 1
 	def set_bid_log(self, bid_log):
 		self.bid_log = bid_log[:]
 		jsonIO.set_row(self.db, self.id, "bid_log", bid_log)
-		return 1;
+		return 1
 	def set_status(self, status):
 		self.status = status
 		jsonIO.set_row(self.db, self.id, "status", status)
-		return 1;
+		return 1
 
 #destructor
 	def remove(self):
 		jsonIO.del_row(self.db, self.id)
 		print (self.id, ' was destroyed.')
 		del self
-		return 1;
+		return 1

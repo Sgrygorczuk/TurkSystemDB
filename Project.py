@@ -72,43 +72,46 @@ class Project:
 	def set_client_id(self, client_id):
 		self.client_id = client_id
 		jsonIO.set_row(self.db, self.id, "client_id", client_id)
-		return 1;
+		return 1
 	def set_bid_id(self, bid_id):
 		self.bid_id = bid_id
 		jsonIO.set_row(self.db, self.id, "bid_id", bid_id)
-		return 1;
+		return 1
 	def set_team_id(self, team_id):
 		self.team_id = team_id
 		jsonIO.set_row(self.db, self.id, "team_id", team_id)
-		return 1;
+		return 1
+	def add_dev_ids(self, dev_id):
+		set_dev_ids(self.dev_ids.append(dev_id))
+		return 1
 	def set_dev_ids(self, dev_ids):
 		self.dev_ids = dev_ids[:]
 		jsonIO.set_row(self.db, self.id, "dev_ids", dev_ids)
-		return 1;
+		return 1
 	def set_title(self, title):
 		self.title = title
 		jsonIO.set_row(self.db, self.id, "title", title)
-		return 1;
+		return 1
 	def set_desc(self, desc):
 		self.desc = desc
 		jsonIO.set_row(self.db, self.id, "desc", desc)
-		return 1;
+		return 1
 	def set_start_date(self, start_date):
 		self.start_date = start_date
 		jsonIO.set_row(self.db, self.id, "start_date", start_date)
-		return 1;
+		return 1
 	def set_end_date(self, end_date):
 		self.end_date = end_date
 		jsonIO.set_row(self.db, self.id, "end_date", end_date)
-		return 1;
+		return 1
 	def set_status(self, status):
 		self.status = status
 		jsonIO.set_row(self.db, self.id, "status", status)
-		return 1;
+		return 1
 
 #destructor
 	def remove(self):
 		jsonIO.del_row(self.db, self.id)
 		print (self.id, ' was destroyed.')
 		del self
-		return 1;
+		return 1
