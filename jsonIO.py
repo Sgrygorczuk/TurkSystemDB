@@ -51,7 +51,7 @@ def add_row(DB, new_row):
     # check if the row exists   
     for item in rows:
         if item["id"] == new_row["id"]: # all our database tables has a "id" attribute
-            print("id:"+str(new_row["id"])+" already exist on the json. Update using set_row(DB, id, key, new_value)")
+            print("id:"+str(new_row["id"])+" already exist on "+DB+".json. Update using set_row(DB, id, key, new_value)")
             return None
     else:
         # add the row
