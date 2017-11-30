@@ -5,6 +5,7 @@ import json
 def create_DB(DB):
     with open(DB+'.json', 'w') as f:
         json.dump({DB:[]}, f)    # {"project_db": []} 
+        print('created '+DB+'.json')
 
 ### TEST
 #create_DB("project_db")
