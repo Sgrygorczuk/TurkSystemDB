@@ -21,7 +21,6 @@ def read_rows(DB):
 	rows = []
 	try:
 		with open(DB+'.json', 'r') as f:
-			if f.read():
 				rows = json.load(f)[DB]     # [{row1}, {row2}, ...]
 	except FileNotFoundError:
 		print("file named "+DB+".json doesn't exist in the current folder." )
