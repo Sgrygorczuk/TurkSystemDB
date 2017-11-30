@@ -147,17 +147,17 @@ def get_value(DB, id, key):
 # 6. get last id
 # pre: DB.json exist
 # post: return the max(id) in the DB.json if there is at least one row in DB.json.
-#       Otherwise, return 0.
+#       Otherwise, return None
 def get_last_id(DB):
     rows = read_rows(DB)
     if (rows == None or len(rows) == 0):
-        return 0
+        return None
     else:
         ids = list(map(lambda row: row["id"], rows)) # extract a list of id
         return max(ids)
 ### TEST
 # get_last_id("project_db")      # 22
-# get_last_id("users")           # 0
+# get_last_id("not_exist")       # None
 ############################################################################
 
 # 7. update a row with new value for an attribute
