@@ -55,23 +55,23 @@ class Task:
 	def set_id(self, id):
 		jsonIO.set_row(self.db, self.id, "id", id)
 		self.id = id
-		return 1;
+		return 1
 	def set_user_id(self, user_id):
 		self.user_id = user_id
 		jsonIO.set_row(self.db, self.id, "user_id", user_id)
-		return 1;
+		return 1
 	def set_issue_desc(self, issue_desc):
 		self.issue_desc = issue_desc
 		jsonIO.set_row(self.db, self.id, "issue_desc", issue_desc)
-		return 1;
+		return 1
 	def set_resolved(self, resolved):
 		self.resolved = resolved
 		jsonIO.set_row(self.db, self.id, "resolved", resolved)
-		return 1;
+		return 1
 
 #destructor
 	def remove(self):
 		jsonIO.del_row(self.db, self.task_id)
 		print (self.task_id, ' was destroyed.')
 		del self
-		return 1;
+		return 1
