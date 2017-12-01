@@ -29,28 +29,31 @@ import numpy
 #pre: given an instance of a class, key, and id (unless id is initialized in object)
 #post: get attribute from a class 
 #	   else return None
-#ex: get_item(User(), "name", 0)
+#ex: get_value(User(), "name", 0)
 #	 returns: System Admit
-#**************************************************not working with just obj & key
 def get_value(obj, key, id = 'Nan'):
-	if id == 'Nan':
-		id = obj.get_id()
-		if not key:
-			print("Key not stated")
-			return None
-		if id == 'Nan':
-			print("ID not initialized")
-			return None
-		else:
-			#can pull from user
-			method = 'get_'+key+'()'
-			method = getattr(obj, method)
-			print(method)
-			return obj.method
-	#otherwise just search db
-	print(1)
-	return jsonIO.get_value(obj.db, id, key)
-	
+    if id == 'Nan':
+        id = obj.get_id()
+        if not key:
+            print("Key not stated")
+            return None
+        elif id == 'Nan':
+            print("ID not initialized")
+            return None
+        else:
+            #can pull from user
+            method = 'get_'+key
+            try:
+                value = getattr(obj, method)()
+                return value
+            except:
+                print("No such key exist")
+                return None
+    #otherwise just search db
+    value = jsonIO.get_value(obj.db, id, key)
+    if value == None:
+        print("Either the id or key does not exist")
+    return value
 #post: returns all items in a database
 def get_all_db(obj):
 	return jsonIO.read_rows(obj.db)
@@ -74,8 +77,7 @@ def get_row(obj, id = 'Nan'):
 	return jsonIO.get_row(obj.db, id)
 	
 #pre: needs valid instance of class and its key
-#pro: returns the whole column of an attribute
-#******************************************************not tested from here down
+#post: returns the whole column of an attribute
 def get_col(obj, key):
 	array = []
 	#don't include SU (id = 0)
@@ -88,26 +90,42 @@ def get_col(obj, key):
 		if attrib!= None:
 			array.append({"id": id, key: attrib})
 	return array
-	
-#***************************************might not be correct****************************
+#####***************************might break at bid_log call*************	
 #pre: any DB array	
 #post: print table
 def print_table(m):
 	if not m:
 		return 0
-	keys = []
+	if type(m) == list:
+		keys = list(m[0].keys())
+	else:
+		keys = list(m.keys())
 	values = []
-	indents = "{:<20}"
-	for key, value in my_dict.iteritems():
-		keys.append(key)
-		values.append(value)
+	indents = "{:<15}"
 	for i in range(0, len(keys)-1):
-		indents += "{ :<20}"
-	print (indents.format(keys))
-	for value in values:
-		print (indents.format(value))
+		indents += " {:<15}"
+	print (indents.format(*keys))
+	#is it a list of dictionary?
+	if type(m) == list:
+		for item in m:
+			values = item.values()
+			values = list(values)
+			val_print(values)
+	else: #it's a dictionary
+		val_print(list(m.values()))
 	return 1
-
+#to be called by print_table
+#values hold collection of values
+def val_print(values):
+    for j in range(len(values)):
+        value = values[j]
+        #is the value a list?
+        if type(value) == list:
+            if value == []:
+                values[j] = '[]'
+            else:
+                values[j] =  ",".join(str(x) for x in value)
+    print (indents.format(*values))
 	
 ###SU######SU######SU######SU######SU######SU######SU######SU######SU######SU######SU###
 
@@ -163,14 +181,17 @@ def tranfer_funcs(from_user, to_user, amount):
 
 	
 ###METRICS######METRICS######METRICS######METRICS######METRICS######METRICS###
-#pre: get Team() object or User() where devs exit with their ids
+#cond: dev    avg (dev,"team")
+#      team   avg (team,"team")
+#      client avg (client, "client")
+#pre: id must exists for all 
 #post: return average
-def calc_avg_rating(object):
+def calc_avg_rating(obj,user):
 	ratings = []
-	if object.__class__ == Team:
-		for id in object.get_dev_ids():
-			ratings.append(get_item(object, id, "ratings"))
-		(numpy.asarray(ratings)).flatten()
-	else:
-		ratings = object.get_ratings()
-	return max(numpy.mean(ratings), 1)
+	user+="_rating"
+	for id in obj.get_project_ids():
+		ratings.append(jsonIO.get_value(obj.db, id, "team_rating"))
+	#if ratings exist return something
+	if ratings:
+		return max(numpy.mean(ratings), 1)
+	return None
