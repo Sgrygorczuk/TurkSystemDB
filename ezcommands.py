@@ -32,7 +32,7 @@ import numpy
 #ex: get_item(User(), "name", 0)
 #	 returns: System Admit
 #**************************************************not working with just obj & key
-def get_item(obj, key, id = 'Nan'):
+def get_value(obj, key, id = 'Nan'):
 	if id == 'Nan':
 		id = obj.get_id()
 		if not key:
@@ -169,7 +169,7 @@ def calc_avg_rating(object):
 	ratings = []
 	if object.__class__ == Team:
 		for id in object.get_dev_ids():
-			ratings.append(get_attribute(object, id, "ratings"))
+			ratings.append(get_item(object, id, "ratings"))
 		(numpy.asarray(ratings)).flatten()
 	else:
 		ratings = object.get_ratings()

@@ -3,14 +3,15 @@ import jsonIO
 class Team:
 	db = "team_db"
 	
-	def __init__(self, admin_ids = [], dev_ids = [], name = "", pic = "", desc = "", project_ids = [], active_project= "", status = ""):
+	def __init__(self, admin_ids = [], dev_ids = [], name = "", pic = "", desc = "",
+		project_ids = [], active_project= "", join_request_ids = [], status = ""):
 		self.id = 'Nan'
 		#might call new_team later on
-		self.new_team(admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
+		self.new_team(admin_ids, dev_ids, name, pic, desc, project_ids, active_project, join_request_ids, status)
 
 	#create a new team in db and in class
-	def new_team(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status):
-		self.set_all(admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status)
+	def new_team(self, admin_ids, dev_ids, name, pic = "", desc = "", project_ids = [], active_project = 'Nan', join_request_ids = [], status = "active"):
+		self.set_all(admin_ids, dev_ids, name, pic, desc, project_ids, active_project, join_request_ids, status)
 		#make new class if not called explicitly
 		if name:
 			self.id = jsonIO.get_last_id(self.db)
@@ -22,7 +23,7 @@ class Team:
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new team in class only
-	def set_all(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, status):
+	def set_all(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, join_request_ids, status, modify_db = 0):
 		self.admin_ids = admin_ids
 		self.dev_ids = dev_ids
 		self.name = name
@@ -30,7 +31,10 @@ class Team:
 		self.desc = desc
 		self.project_ids = project_ids
 		self.active_project = active_project
+		self.join_request_ids = join_request_ids
 		self.status = status
+		if modify_db:
+			jsonIO.set_row(self.db, self.get_all())
 		
 	#will load db into the class (must at least set id) will return 1 or 0 upon success or failure respectively
 	def load_db(self, id):
@@ -44,8 +48,8 @@ class Team:
 
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
-		#self.project_id = dict["id"]
-		self.set_all(dict["admin_ids"], dict["dev_ids"], dict["name"], dict["pic"], dict["desc"], dict["project_ids"], dict["active_project"], dict["status"])
+		self.set_all(dict["admin_ids"], dict["dev_ids"], dict["name"], dict["pic"], dict["desc"],
+		dict["project_ids"], dict["active_project"], dict["join_request_ids"], dict["status"])
 		
 	#get_ methods
 	def get_id(self): 
@@ -62,17 +66,19 @@ class Team:
 		return self.desc
 	def get_project_ids(self):
 		return self.project_ids
-	def get_active_project(self): 
+	def get_active_project(self):
 		return self.active_project
+	def get_join_request_ids(self):
+		return self.join_request_ids
 	def get_status(self): 
 		return self.status
 	def get_all(self):
 		return {"id":self.id, "admin_ids":self.admin_ids, "dev_ids":self.dev_ids, "name":self.name, "pic":self.pic, "desc":self.desc,
-		"project_ids":self.project_ids, "active_project":self.active_project, "status":self.status}
+		"project_ids":self.project_ids, "active_project":self.active_project, "join_request_ids":self.join_request_ids, "status":self.status}
 	
 	#update project_db
 	def set_id(self, id): 
-		jsonIO.set_row(self.db, self.id, "id", id)
+		jsonIO.set_value(self.db, self.id, "id", id)
 		self.id = id
 		return 1
 	def add_admin_ids(self, admin_id):
@@ -80,41 +86,48 @@ class Team:
 		return 1
 	def set_admin_ids(self, admin_ids): 
 		self.admin_ids = admin_ids[:]
-		jsonIO.set_row(self.db, self.id, "admin_ids", admin_ids)
+		jsonIO.set_value(self.db, self.id, "admin_ids", admin_ids)
 		return 1
 	def add_dev_ids(self, dev_id):
 		set_dev_ids(self.dev_ids.append(dev_id))
 		return 1
 	def set_dev_ids(self, dev_ids): 
 		self.dev_ids = dev_ids[:]
-		jsonIO.set_row(self.db, self.id, "dev_ids", dev_ids)
+		jsonIO.set_value(self.db, self.id, "dev_ids", dev_ids)
 		return 1
 	def set_name(self, name): 
 		self.name = name
-		jsonIO.set_row(self.db, self.id, "name", name)
+		jsonIO.set_value(self.db, self.id, "name", name)
 		return 1
 	def set_pic(self, pic): 
 		self.pic = pic
-		jsonIO.set_row(self.db, self.id, "pic", pic)
+		jsonIO.set_value(self.db, self.id, "pic", pic)
 		return 1
 	def set_desc(self, desc): 
 		self.desc = desc
-		jsonIO.set_row(self.db, self.id, "desc", desc)
+		jsonIO.set_value(self.db, self.id, "desc", desc)
 		return 1
 	def add_project_ids(self, project_id):
 		set_project_ids(self.project_ids.append(project_id))
 		return 1
 	def set_project_ids(self, project_ids):
 		self.project_ids = project_ids[:]
-		jsonIO.set_row(self.db, self.id, "project_ids", project_ids)
+		jsonIO.set_value(self.db, self.id, "project_ids", project_ids)
 		return 1
 	def set_active_project(self, active_project): 
 		self.active_project = active_project
-		jsonIO.set_row(self.db, self.id, "active_project", active_project)
+		jsonIO.set_value(self.db, self.id, "active_project", active_project)
+		return 1
+	def add_join_request_ids(self, join_request_id):
+		set_join_request_ids(self.join_request_ids.append(join_request_id))
+		return 1
+	def set_join_request_ids(self, join_request_ids):
+		self.join_request_ids = join_request_ids[:]
+		jsonIO.set_value(self.db, self.id, "join_request_ids", join_request_ids)
 		return 1
 	def set_status(self, active_project): 
 		self.active_project = active_project
-		jsonIO.set_row(self.db, self.project_id, "active_project", active_project)
+		jsonIO.set_value(self.db, self.project_id, "active_project", active_project)
 		return 1
 		
 	#destructor
