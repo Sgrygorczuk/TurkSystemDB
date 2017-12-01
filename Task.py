@@ -9,35 +9,38 @@ class Task:
 		self.new_issue(user_id, issue_desc, resolved)
 		
 	#create a new issue in db and in class
-	def new_issue(self, user_id, issue_desc, resolved): 
-		self.id = jsonIO.get_last_id(self.db)
-		#if no ids made
-		if self.id == None:
-			self.id = 0
-		else:
-			self.id += 1 #last+1 for new
+	def new_issue(self, user_id, issue_desc, resolved = False): 
 		self.set_all(user_id, issue_desc, resolved)
-		if user_id == 'Nan':
+		#make new class if not called explicitly
+		if user_id != 'Nan':
+			self.id = jsonIO.get_last_id(self.db)
+			#if no ids made
+			if self.id == None:
+				self.id = 0
+			else:
+				self.id += 1 #last+1 for new
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new issue in class only
-	def set_all(self, user_id, issue_desc, resolved):
+	def set_all(self, user_id, issue_desc, resolved, modify_db = 0):
 		self.user_id = user_id
 		self.issue_desc = issue_desc
 		self.resolved = resolved #true/false
+		if modify_db:
+			jsonIO.set_row(self.db, self.get_all())
 	
 	#will load db into the class (must at least set id) will return 1 or 0 upon success or failure respectively
 	def load_db(self, id):
-		if id != 'Nan':
-			self.issued_id = issued_id
-			self.dump(jsonIO.load_db(self.db,id))
+		array = jsonIO.get_row(self.db, id)
+		if array:
+			self.id = id
+			self.dump(array)
 			return 1
 		else:
 			return 0
 			
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
-		#self.id = dict["id"]
 		self.set_all(dict["user_id"], dict["issue_desc"], dict["resolved"])
 
 	#get_ methods
@@ -56,20 +59,20 @@ class Task:
 	
 	#update bid_db
 	def set_id(self, id):
-		jsonIO.set_row(self.db, self.id, "id", id)
+		jsonIO.set_value(self.db, self.id, "id", id)
 		self.id = id
 		return 1
 	def set_user_id(self, user_id):
 		self.user_id = user_id
-		jsonIO.set_row(self.db, self.id, "user_id", user_id)
+		jsonIO.set_value(self.db, self.id, "user_id", user_id)
 		return 1
 	def set_issue_desc(self, issue_desc):
 		self.issue_desc = issue_desc
-		jsonIO.set_row(self.db, self.id, "issue_desc", issue_desc)
+		jsonIO.set_value(self.db, self.id, "issue_desc", issue_desc)
 		return 1
 	def set_resolved(self, resolved):
 		self.resolved = resolved
-		jsonIO.set_row(self.db, self.id, "resolved", resolved)
+		jsonIO.set_value(self.db, self.id, "resolved", resolved)
 		return 1
 
 #destructor
