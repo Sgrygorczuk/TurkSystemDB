@@ -5,10 +5,10 @@ class User:
 	db = "user_db"
 
 	def __init__(self, name= "", username = "", password = "", user_type = "", balance = 0,
-		status = "", warning = 0, resume = "", interest = "", pic = "", issue_ids = [], team_id = 'Nan', project_ids = []):
+		status = "", warning = 0, resume = "", pic = "", interest = "", issue_ids = [], team_id = 'Nan', project_ids = []):
 		self.id = 'Nan'
 		#might call new_user later on
-		self.new_user(name, username, password, user_type, balance, status, warning, resume, interest, pic, issue_ids, team_id, project_ids)
+		self.new_user(name, username, password, user_type, balance, status, warning, resume, pic, interest, issue_ids, team_id, project_ids)
 	
 	#create a new user in db and in class
 	def new_user(self, name, username, password, user_type, balance,
@@ -38,29 +38,29 @@ class User:
 		self.warning = warning
 		#userInfo
 		self.resume = resume
-		self.interest = interest
 		self.pic = pic
-		self.issue_ids = issue_ids
+		self.interest = interest
+		self.issue_ids = list(issue_ids)
 		#for registered only
 		self.team_id = team_id
-		self.project_ids = project_ids #list of project ids that has been worked or active
+		self.project_ids = list(project_ids) #list of project ids that has been worked or active
 		if modify_db:
 			jsonIO.set_row(self.db, self.get_all())
 		
-	#will load db into the class (must at least set id) will return 1 or 0 upon success or failure respectively
+	#will load db into the class (must at least set id) will return array
 	def load_db(self, id):
 		array = jsonIO.get_row(self.db, id)
 		if array:
 			self.id = id
 			self.dump(array)
-			return 1
+			return array
 		else:
-			return 0
+			return []
 	
 	#breakdown the array and load into the class
 	def dump(self, dict):
 			self.set_all(dict["name"], dict["username"], dict["password"], dict["user_type"], dict["balance"],
-			dict["status"], dict["warning"], dict["resume"], dict["interest"], dict["pic"], dict["issue_ids"],
+			dict["status"], dict["warning"], dict["resume"], dict["pic"], dict["interest"], dict["issue_ids"],
 			dict["team_id"], dict["project_ids"])
 	
 	#get_ methods user
@@ -83,6 +83,8 @@ class User:
 	#get_ methods userinfo
 	def get_resume(self): 
 		return self.resume
+	def get_pic(self): 
+		return self.pic
 	def get_interest(self): 
 		return self.interest
 	def get_issue_ids(self): 
@@ -155,12 +157,17 @@ class User:
 		jsonIO.set_value(self.db, self.id, "insterest", insterest)
 		return 1
 	def add_issue_ids(self, issue_id):
-		set_Issue_ids(self.issue_ids.append(issue_id))
-		return 1
+		if issue_id != 'Nan':
+			(self.issue_ids).append(issue_id)
+			jsonIO.set_value(self.db, self.id, "issue_ids", self.issue_ids)
+			return 1
+		return 0
 	def set_Issue_ids(self, issue_ids):
-		self.issue_ids = issue_ids[:]
-		jsonIO.set_value(self.db, self.id, "issue_ids", issue_ids)
-		return 1	
+		if issue_ids:
+			self.issue_ids = list(issue_ids)
+			jsonIO.set_value(self.db, self.id, "issue_ids", self.issue_ids)
+			return 1
+		return 0
 	
 	#update userInfo_db
 	def set_team_id(self, team_id):
@@ -168,12 +175,17 @@ class User:
 		jsonIO.set_value(self.db, self.id, "team_id", team_id)
 		return 1
 	def add_project_ids(self, project_id):
-		set_project_ids(self.project_ids.append(project_id))
-		return 1
+		if project_id != 'Nan':
+			(self.project_ids).append(project_id)
+			jsonIO.set_value(self.db, self.id, "project_ids", self.project_ids)
+			return 1
+		return 0
 	def set_project_ids(self, project_ids):
-		self.project_ids = project_ids[:]
-		jsonIO.set_value(self.db, self.id, "project_ids", project_ids)
-		return 1
+		if project_ids:
+			self.project_ids = list(project_ids)
+			jsonIO.set_value(self.db, self.id, "project_ids", self.project_ids)
+			return 1
+		return 0
 	
 	#destructor
 	def remove(self):

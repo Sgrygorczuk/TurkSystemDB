@@ -154,7 +154,7 @@ def print_table(m):
 	
 	
 #/\/\/\/\SU/\/\/\/\SU/\/\/\/\SU/\/\/\/\SU/\/\/\/\SU/\/\/\/\SU/\/\/\/\SU/\/\/\/\SU/\/\/\/\
-
+			   
 #pre: needs a valid user of type user and could also do it from an id
 #post: returns dictionary of status of the user: user_type, status, warning, and balance
 #else returns None
@@ -403,16 +403,24 @@ def project_fund_transfer(from_user, to_user, amount):
 #      team   avg (team,"team")
 #      client avg (client, "client")
 #pre: id must exists for all 
-#post: return average
-def calc_avg_rating(obj,user):
-	ratings = []
-	user+="_rating"
-	for id in obj.get_project_ids():
-		ratings.append(jsonIO.get_value(obj.db, id, "team_rating"))
-	#if ratings exist return something
-	if ratings:
-		return max(numpy.mean(ratings), 1)
-	return None
+#post: return average rate
+def get_grade(obj, user, dict = False):
+    grade = []
+    user+="_rating"
+    #grade for class
+    if not dict:
+        for id in obj.get_project_ids():
+            grade.append(jsonIO.get_value("project_db", id, user))
+    #grade for dict
+    elif dict:
+        for id in obj["project_ids"]:
+            grade.append(jsonIO.get_value("project_db", id, user))
+    #if rate exist return something
+    else:
+        return None
+    if grade:
+        return max(numpy.mean(grade), 1)
+    return None
 	
 #/\/\/\/\HELPER FUNTIONS/\/\/\/\HELPER FUNTIONS/\/\/\/\HELPER FUNTIONS/\/\/\/\
 #pre: must have a valid db, key and value
@@ -484,3 +492,15 @@ def tranfer_funds(from_user, to_user, amount):
     from_user.withdraw(amount)
     to_user.deposit(amount)
     return 1
+	
+#cond: dict will contain a dict of user (has "team_id and id")
+#pre: team_id must exits
+#post: returns team admin
+def is_admin(dict):
+   if dict["team_id"] == "Nan":
+       return False
+   else:
+       team = get_row(Team(), dict["team_id"])
+       for admin in team["admin_ids"]:
+           if dict["id"] == admin:
+               return True

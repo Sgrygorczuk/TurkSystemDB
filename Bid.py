@@ -1,5 +1,6 @@
 import jsonIO
 from datetime import datetime
+import copy
 
 class Bid:
 	db = "bid_db"
@@ -23,7 +24,7 @@ class Bid:
 		self.start_date = start_date
 		self.end_date = end_date
 		self.final_bid = initial_bid
-		self.bid_log = bid_log #time, bidder's id, amount, suggested end time
+		self.bid_log = copy.deepcopy(bid_log) #time, bidder's id, amount, suggested end time
 		self.status = status
 		if modify_db:
 			jsonIO.set_row(self.db, self.get_all())
@@ -34,9 +35,9 @@ class Bid:
 		if array:
 			self.id = id
 			self.dump(array)
-			return 1
+			return array
 		else:
-			return 0
+			return []
 			
 	#breakdown the dictionary and load into the class
 	def dump(self, dict):
@@ -78,13 +79,18 @@ class Bid:
 		jsonIO.set_value(self.db, self.id, "end_date", end_date)
 		return 1
 	#creating bid_log
-	def add_bid(self, bidder_id, amount, time = now):
-		set_bid_log(self.bid_log.append({bidder_id, amount, time}))
-		return 1
+	def add_bid_log(self, bidder_id, amount, suggested_time, time = now):
+		if time and bidder_id != 'Nan' and amount and suggested_time:
+			(self.bid_log).append({time, bidder_id, amount, suggested_time})
+			jsonIO.set_value(self.db, self.id, "bid_log", self.bid_log)
+			return 1
+		return 0
 	def set_bid_log(self, bid_log):
-		self.bid_log = bid_log[:]
-		jsonIO.set_value(self.db, self.id, "bid_log", bid_log)
-		return 1
+		if bid_log == [[]]:
+			self.bid_log = copy.deepcopy(bid_log)
+			jsonIO.set_value(self.db, self.id, "bid_log", self.bid_log)
+			return 1
+		return 0
 	def set_status(self, status):
 		self.status = status
 		jsonIO.set_value(self.db, self.id, "status", status)

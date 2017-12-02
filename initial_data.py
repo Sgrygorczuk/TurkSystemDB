@@ -36,6 +36,32 @@ bid2 = Bid()
 bid3 = Bid()
 bid4 = Bid()
 
+def reload():
+	super_user.load_db(0)
+	user1.load_db(1)
+	user2.load_db(2)
+	user3.load_db(3)
+	user4.load_db(4)
+
+	t1.load_db(0)
+	t2.load_db(1)
+	t3.load_db(2)
+
+	client1.load_db(5)
+	client2.load_db(6)
+	client3.load_db(7)
+	client4.load_db(8)
+
+	project1.load_db(0)
+	project2.load_db(1)
+	project3.load_db(2)
+	project4.load_db(3)
+
+	bid1.load_db(0)
+	bid2.load_db(1)
+	bid3.load_db(2)
+	bid4.load_db(3)
+
 def run():
 	super_user.new_user(name = "System Admin", username = "admin", password = "pass", user_type = "admin",  balance = 100)
 	user1.new_user(name = "Johnny Boy", username = "eats", password = "Dog", user_type = "developer", balance = 12)
@@ -53,9 +79,9 @@ def run():
 	client4.new_user(name = "Morty", username = "rick", password = 'adventure', user_type = "client", balance = 145)
 
 	project1.new_project(client_id = client1.get_id(), title = "Hello", desc = "I have a lot of money", bid_id = now, team_id = t1.get_id(), start_date = now, end_date = now)
-	project2.new_project(client_id = client2.get_id(), title = "World", desc = "I have a lot of money, too?", bid_id = now, team_id = t2.get_id(), start_date = now, end_date = now)
-	project3.new_project(client_id = client3.get_id(), title = "Goodbye", desc = "I have more money than the other guy", team_id = t3.get_id(), bid_id = now, start_date = now, end_date = now)
-	project4.new_project(client_id = client4.get_id(), title = "VR", desc = "Don't listen to any of them, I have the most", bid_id = now, start_date = now, end_date = now)
+	project2.new_project(client_id = client1.get_id(), title = "World", desc = "I have a lot of money, too?", bid_id = now, team_id = t2.get_id(), start_date = now, end_date = now)
+	project3.new_project(client_id = client1.get_id(), title = "Goodbye", desc = "I have more money than the other guy", team_id = t3.get_id(), bid_id = now, start_date = now, end_date = now)
+	project4.new_project(client_id = client1.get_id(), title = "VR", desc = "Don't listen to any of them, I have the most", bid_id = now, start_date = now, end_date = now)
 
 	bid1.new_bid(project_id = project1.get_id(), start_date = now, end_date=now, initial_bid = 1000)
 	bid2.new_bid(project_id = project2.get_id(), start_date = now, end_date=now, initial_bid = 1000)

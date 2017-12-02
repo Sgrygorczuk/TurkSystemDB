@@ -24,14 +24,14 @@ class Team:
 	
 	#create a new team in class only
 	def set_all(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, join_request_ids, status, modify_db = 0):
-		self.admin_ids = admin_ids
-		self.dev_ids = dev_ids
+		self.admin_ids = list(admin_ids)
+		self.dev_ids = list(dev_ids)
 		self.name = name
 		self.pic = pic
 		self.desc = desc
-		self.project_ids = project_ids
+		self.project_ids = list(project_ids)
 		self.active_project = active_project
-		self.join_request_ids = join_request_ids
+		self.join_request_ids = list(join_request_ids)
 		self.status = status
 		if modify_db:
 			jsonIO.set_row(self.db, self.get_all())
@@ -42,9 +42,9 @@ class Team:
 		if array:
 			self.id = id
 			self.dump(array)
-			return 1
+			return array
 		else:
-			return 0
+			return []
 
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
@@ -82,19 +82,28 @@ class Team:
 		self.id = id
 		return 1
 	def add_admin_ids(self, admin_id):
-		set_admin_ids(self.admin_ids.append(admin_id))
-		return 1
-	def set_admin_ids(self, admin_ids): 
-		self.admin_ids = admin_ids[:]
-		jsonIO.set_value(self.db, self.id, "admin_ids", admin_ids)
-		return 1
+		if admin_id != 'Nan':
+			(self.admin_ids).append(admin_id)
+			return 1
+		return 0
+	def set_admin_ids(self, admin_ids):
+		if admin_ids:
+			self.admin_ids = list(admin_ids)
+			jsonIO.set_value(self.db, self.id, "admin_ids", admin_ids)
+			return 1
+		return 0
 	def add_dev_ids(self, dev_id):
-		set_dev_ids(self.dev_ids.append(dev_id))
-		return 1
-	def set_dev_ids(self, dev_ids): 
-		self.dev_ids = dev_ids[:]
-		jsonIO.set_value(self.db, self.id, "dev_ids", dev_ids)
-		return 1
+		if dev_id != 'Nan':
+			(self.dev_ids).append(dev_id)
+			jsonIO.set_value(self.db, self.id, "dev_ids", self.dev_ids)
+			return 1
+		return 0
+	def set_dev_ids(self, dev_ids):
+		if dev_ids:
+			self.dev_ids = list(dev_ids)
+			jsonIO.set_value(self.db, self.id, "dev_ids", self.dev_ids)
+			return 1
+		return 0
 	def set_name(self, name): 
 		self.name = name
 		jsonIO.set_value(self.db, self.id, "name", name)
@@ -108,23 +117,33 @@ class Team:
 		jsonIO.set_value(self.db, self.id, "desc", desc)
 		return 1
 	def add_project_ids(self, project_id):
-		set_project_ids(self.project_ids.append(project_id))
-		return 1
+		if project_id != 'Nan':
+			(self.project_ids).append(project_id)
+			jsonIO.set_value(self.db, self.id, "project_ids", self.project_ids)
+			return 1
+		return 0
 	def set_project_ids(self, project_ids):
-		self.project_ids = project_ids[:]
-		jsonIO.set_value(self.db, self.id, "project_ids", project_ids)
-		return 1
+		if project_ids:	
+			self.project_ids = list(project_ids)
+			jsonIO.set_value(self.db, self.id, "project_ids", self.project_ids)
+			return 1
+		return 0
 	def set_active_project(self, active_project): 
 		self.active_project = active_project
 		jsonIO.set_value(self.db, self.id, "active_project", active_project)
 		return 1
 	def add_join_request_ids(self, join_request_id):
-		set_join_request_ids(self.join_request_ids.append(join_request_id))
-		return 1
+		if join_request_id != 'Nan':
+			(self.join_request_ids).append(join_request_id)
+			jsonIO.set_value(self.db, self.id, "join_request_ids", self.join_request_ids)
+			return 1
+		return 0
 	def set_join_request_ids(self, join_request_ids):
-		self.join_request_ids = join_request_ids[:]
-		jsonIO.set_value(self.db, self.id, "join_request_ids", join_request_ids)
-		return 1
+		if join_request_ids:
+			self.join_request_ids = list(join_request_ids)
+			jsonIO.set_value(self.db, self.id, "join_request_ids", self.join_request_ids)
+			return 1
+		return 0
 	def set_status(self, active_project): 
 		self.active_project = active_project
 		jsonIO.set_value(self.db, self.project_id, "active_project", active_project)

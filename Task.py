@@ -35,9 +35,9 @@ class Task:
 		if array:
 			self.id = id
 			self.dump(array)
-			return 1
+			return array
 		else:
-			return 0
+			return []
 			
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
