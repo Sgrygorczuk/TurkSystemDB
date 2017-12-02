@@ -3,17 +3,17 @@ import jsonIO
 #There are _user_db>SU | Customer>Temp | Registered> Client | Developer | Blacklisted
 class User:
 	db = "user_db"
-	
-	def __init__(self, name= "", username = "", password = "", user_type = "",
-		status = "", balance = 0, warning = 0, resume = "", interest = "", pic = "", issue_ids = [], team_id = 'Nan', project_ids = []):
+
+	def __init__(self, name= "", username = "", password = "", user_type = "", balance = 0,
+		status = "", warning = 0, resume = "", interest = "", pic = "", issue_ids = [], team_id = 'Nan', project_ids = []):
 		self.id = 'Nan'
 		#might call new_user later on
-		self.new_user(name, username, password, user_type, status, balance, warning, resume, interest, pic, issue_ids, team_id, project_ids)
+		self.new_user(name, username, password, user_type, balance, status, warning, resume, interest, pic, issue_ids, team_id, project_ids)
 	
 	#create a new user in db and in class
-	def new_user(self, name, username, password, user_type,
-		status = "active", balance = 0, warning = 0, resume = "", pic = "", interest = "", issue_ids = [], team_id = 'Nan', project_ids = []):
-		self.set_all(name, username, password, user_type, status, balance, warning, resume, pic, interest, issue_ids, team_id, project_ids)
+	def new_user(self, name, username, password, user_type, balance,
+		status = "temp", warning = 0, resume = "", pic = "", interest = "", issue_ids = [], team_id = 'Nan', project_ids = []):
+		self.set_all(name, username, password, user_type, balance, status, warning, resume, pic, interest, issue_ids, team_id, project_ids)
 		#make new class if not called explicitly
 		if username:
 			self.id = jsonIO.get_last_id(self.db)
@@ -25,16 +25,16 @@ class User:
 			jsonIO.add_row(self.db, self.get_all())
 			
 	#create a new user in class only
-	def set_all(self, name, username, password, user_type,
-		status, balance, warning, resume="", pic="", interest="", issue_ids = [], team_id = 'Nan', project_ids = [], modify_db = 0):
+	def set_all(self, name, username, password, user_type, balance,
+		status, warning, resume="", pic="", interest="", issue_ids = [], team_id = 'Nan', project_ids = [], modify_db = 0):
 		#userCred_db
 		self.name = name
 		self.username = username
 		self.password = password
 		#user_db
-		self.user_type = user_type #temp, dev, client, SU
-		self.status = status #(active, blacklisted, temp)
-		self.balance = balance
+		self.user_type = user_type #dev, client, SU
+		self.balance = balance #must be positive
+		self.status = status #(active, blacklisted, temp, rejected)
 		self.warning = warning
 		#userInfo
 		self.resume = resume
@@ -59,8 +59,8 @@ class User:
 	
 	#breakdown the array and load into the class
 	def dump(self, dict):
-			self.set_all(dict["name"], dict["username"], dict["password"], dict["user_type"],
-			dict["status"], dict["balance"], dict["warning"], dict["resume"], dict["interest"], dict["pic"], dict["issue_ids"],
+			self.set_all(dict["name"], dict["username"], dict["password"], dict["user_type"], dict["balance"],
+			dict["status"], dict["warning"], dict["resume"], dict["interest"], dict["pic"], dict["issue_ids"],
 			dict["team_id"], dict["project_ids"])
 	
 	#get_ methods user
@@ -74,10 +74,10 @@ class User:
 		return self.password
 	def get_user_type(self): 
 		return self.user_type
-	def get_status(self): 
-		return self.status
 	def get_balance(self): 
 		return self.balance
+	def get_status(self): 
+		return self.status
 	def get_warning(self):
 		return self.warning
 	#get_ methods userinfo
@@ -94,7 +94,7 @@ class User:
 		return self.project_ids
 	def get_all(self):
 		return {"id":self.id, "name":self.name, "username":self.username, "password":self.password,
-		"user_type":self.user_type, "status":self.status, "balance":self.balance, "warning":self.balance,
+		"user_type":self.user_type, "balance":self.balance, "status":self.status, "warning":self.balance,
 		"resume":self.resume, "pic":self.pic, "interest":self.interest, "issue_ids":self.issue_ids,
 		"team_id":self.team_id, "project_ids":self.project_ids}
 		
@@ -107,23 +107,21 @@ class User:
 		self.user_type = user_type
 		jsonIO.set_value(self.db, self.id, "user_type", user_type)
 		return 1
+	def deposit(self, amount):
+		self.balance += amount
+		jsonIO.set_value(self.db, self.id, "balance", self.balance)
+		return 1
+	def withdraw(self, amount):
+		if self.balance >= amount:
+			self.balance -= amount
+			jsonIO.set_value(self.db, self.id, "balance", self.balance)
+			return 1
+		else:
+			return 0
 	def set_status(self, status):
 		self.status = status
 		jsonIO.set_value(self.db, self.id, "status", status)
 		return 1
-		
-	#update userInfo_db
-	def deposit(self, amount):
-		self.amount += amount
-		jsonIO.set_value(self.db, self.id, "balance", self.amount)
-		return 1
-	def withdraw(self, amount):
-		if get_balance() >= amount:
-			self.amount -= amount
-			jsonIO.set_value(self.db, self.id, "balance", self.amount)
-			return 1
-		else:
-			return 0
 	def set_warning(self, warning):
 		self.warning = warning
 		jsonIO.set_value(self.db, self.id, "warning", warning)

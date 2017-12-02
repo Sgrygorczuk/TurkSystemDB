@@ -3,27 +3,27 @@ from datetime import datetime
 
 class Bid:
 	db = "bid_db"
-	now = str(datetime.now())
+	now = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 	
 	#bid_id = project_id
-	def __init__(self, project_id = 'Nan', start_date = "", end_date = "", final_bid = 'Nan', bid_log = [[] for i in range(3)], status = ""):
+	def __init__(self, project_id = 'Nan', start_date = "", end_date = "", initial_bid = 'Nan', bid_log = [[] for i in range(4)], status = ""):
 		#might call new_bid later on
-		self.new_bid(project_id,start_date, end_date, final_bid, bid_log, status)
+		self.new_bid(project_id, start_date, end_date, initial_bid, bid_log, status)
 	
 	#create a new bid in db and in class
-	def new_bid(self,project_id, start_date, end_date, final_bid = 'Nan', bid_log = [[] for i in range(3)], status = "active"):
-		self.set_all(start_date, end_date, final_bid, bid_log, status)
+	def new_bid(self,project_id, start_date, end_date, initial_bid, bid_log = [[] for i in range(4)], status = "active"):
+		self.set_all(start_date, end_date, initial_bid, bid_log, status)
 		self.id = project_id
 		#make new class if not called explicitly
 		if start_date:
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new bid in class only
-	def set_all(self, start_date, end_date, final_bid, bid_log, status, modify_db = 0):
+	def set_all(self, start_date, end_date, initial_bid, bid_log, status, modify_db = 0):
 		self.start_date = start_date
 		self.end_date = end_date
-		self.final_bid = final_bid
-		self.bid_log = bid_log #time, bidder's id, amount
+		self.final_bid = initial_bid
+		self.bid_log = bid_log #time, bidder's id, amount, suggested end time
 		self.status = status
 		if modify_db:
 			jsonIO.set_row(self.db, self.get_all())
