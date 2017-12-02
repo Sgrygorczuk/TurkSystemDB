@@ -34,6 +34,14 @@ import numpy
 #user_report(user, id = 'Nan'): returns status of the user:
 #                               user_type, status, warning, and balance
 #verify(username, password = ""): returns [case number, user, message]
+#project_completion : decides what to do after project is completed
+#                     users rate each other:
+#							what to do with bid money
+#							blaklist users
+#                     and other modifications
+#quit_request:
+#dissolve_team:
+#quit_team:
 #----------------------------------------------------------------------------
 #Class creation
 #user_exists(username): returns 1 if user exist else returns 0
@@ -41,14 +49,17 @@ import numpy
 #              places new temp_user in SU tasks
 #create_project(): will return and make a new project
 #create_bid(project_id, start_date, end_date, initial_bid): returns a new bid
-#
 #---------------------------------------------------------------------------
 #Special functions
 #project_fund_transfer(from_user, to_user, amount): it will modify both 
 #             balances and create task. Check below for more details.
+#start_bid
+#make_bid
+#end_bid: make needed modifications such as penalty or set_team_id
 #----------------------------------------------------------------------------
 #Metrics
-#calc_avg_rating(obj,user): returns the average rating of dev, team, or client
+#get_grade(obj,user,dic=false): returns the average rating of dev, team, or client
+#get_total_commision(obj,user,dic=false): returns the money made by all projects from user/ team
 #----------------------------------------------------------------------------
 #Helper functions
 #find_row(db, key, value): returns row of given key value
@@ -58,6 +69,7 @@ import numpy
 #datetime_to_string(dt_time): returns string form
 #get_n_days_later(time, n): return string with added days 
 #tranfer_funds(from_user, to_user, amount): it will modify both balances
+#is_admin(dic): returns true if user is team admin
 #############################################################################
 
 #/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\

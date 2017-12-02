@@ -7,24 +7,24 @@ class Bid:
 	now = str(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 	
 	#bid_id = project_id
-	def __init__(self, project_id = 'Nan', start_date = "", end_date = "", initial_bid = 'Nan', bid_log = [[] for i in range(4)], status = ""):
+	def __init__(self, project_id = 'Nan', end_date = "", initial_bid = 'Nan', bid_log = [[] for i in range(4)], comments = "", status = ""):
 		#might call new_bid later on
-		self.new_bid(project_id, start_date, end_date, initial_bid, bid_log, status)
+		self.new_bid(project_id, end_date, initial_bid, bid_log, comments, status)
 	
 	#create a new bid in db and in class
-	def new_bid(self,project_id, start_date, end_date, initial_bid, bid_log = [[] for i in range(4)], status = "active"):
-		self.set_all(start_date, end_date, initial_bid, bid_log, status)
+	def new_bid(self,project_id, end_date, initial_bid, bid_log = [[] for i in range(4)], comments = "", status = "active"):
+		self.set_all(end_date, initial_bid, bid_log, comments, status)
 		self.id = project_id
 		#make new class if not called explicitly
-		if start_date:
+		if end_date:
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new bid in class only
-	def set_all(self, start_date, end_date, initial_bid, bid_log, status, modify_db = 0):
-		self.start_date = start_date
+	def set_all(self, end_date, initial_bid, bid_log, comments, status, modify_db = 0):
 		self.end_date = end_date
 		self.final_bid = initial_bid
 		self.bid_log = copy.deepcopy(bid_log) #time, bidder's id, amount, suggested end time
+		self.comments = comments
 		self.status = status
 		if modify_db:
 			jsonIO.set_row(self.db, self.get_all())
@@ -41,26 +41,26 @@ class Bid:
 			
 	#breakdown the dictionary and load into the class
 	def dump(self, dict):
-		self.set_all(dict["start_date"], dict["end_date"], dict["final_bid"], dict["bid_log"], dict["status"])
+		self.set_all(dict["end_date"], dict["final_bid"], dict["bid_log"], dict["comments"], dict["status"])
 	
 	#get_ methods
 	def get_id(self):
 		return self.id
 	def get_project_id(self): 
 		return self.id
-	def get_start_date(self): 
-		return self.start_date
 	def get_end_date(self): 
 		return self.end_date
 	def get_final_bid(self):
 		return self.final_bid
 	def get_bid_log(self): 
 		return self.bid_log
+	def get_comments(self): 
+		return self.comments
 	def get_status(self): 
 		return self.status
 	def get_all(self):
-		return {"id":self.id, "start_date":self.start_date, "end_date":self.end_date,
-		"final_bid":self.final_bid, "bid_log":self.bid_log, "status":self.status}
+		return {"id":self.id, "end_date":self.end_date,
+		"final_bid":self.final_bid, "bid_log":self.bid_log, "comments":self.comments, "status":self.status}
 
 	#update bid_db
 	def set_id(self, id):
@@ -69,10 +69,6 @@ class Bid:
 		return 1
 	def set_project_id(self, project_id):
 		self.id = project_id
-		return 1
-	def set_start_date(self, start_date):
-		self.start_date = start_date
-		jsonIO.set_value(self.db, self.id, "start_date", start_date)
 		return 1
 	def set_end_date(self, end_date):
 		self.end_date = end_date
@@ -91,6 +87,10 @@ class Bid:
 			jsonIO.set_value(self.db, self.id, "bid_log", self.bid_log)
 			return 1
 		return 0
+	def set_comments(self, comments):
+		self.comments = comments
+		jsonIO.set_value(self.db, self.id, "comments", comments)
+		return 1
 	def set_status(self, status):
 		self.status = status
 		jsonIO.set_value(self.db, self.id, "status", status)

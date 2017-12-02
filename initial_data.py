@@ -6,6 +6,9 @@ from Task import *
 import ezcommands as ez
 from datetime import *
 
+#run():    creates classes
+#reload(): reloads the classes from db
+
 now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 dt_now = datetime.strptime(now, "%Y-%m-%d %H:%M:%S")
 dt_later = dt_now + timedelta(days=1)
@@ -83,7 +86,7 @@ def run():
 	project3.new_project(client_id = client1.get_id(), title = "Goodbye", desc = "I have more money than the other guy", team_id = t3.get_id(), bid_id = now, start_date = now, end_date = now)
 	project4.new_project(client_id = client1.get_id(), title = "VR", desc = "Don't listen to any of them, I have the most", bid_id = now, start_date = now, end_date = now)
 
-	bid1.new_bid(project_id = project1.get_id(), start_date = now, end_date=now, initial_bid = 1000)
-	bid2.new_bid(project_id = project2.get_id(), start_date = now, end_date=now, initial_bid = 1000)
-	bid3.new_bid(project_id = project3.get_id(), start_date = now, end_date=now, initial_bid = 1000)
-	bid4.new_bid(project_id = project4.get_id(), start_date = now, end_date=now, initial_bid = 1000)
+	bid1.new_bid(project_id = project1.get_id(), end_date=now, initial_bid = 1000)
+	bid2.new_bid(project_id = project2.get_id(), end_date=now, initial_bid = 1000)
+	bid3.new_bid(project_id = project3.get_id(), end_date=now, initial_bid = 1000)
+	bid4.new_bid(project_id = project4.get_id(), end_date=now, initial_bid = 1000)
