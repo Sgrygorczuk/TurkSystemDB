@@ -45,9 +45,9 @@ class Project:
 		if array:
 			self.id = id
 			self.dump(array)
-			return 1
+			return array
 		else:
-			return 0
+			return []
 
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
@@ -111,13 +111,21 @@ class Project:
 		jsonIO.set_value(self.db, self.id, "bid_id", bid_id)
 		return 1
 	def set_client_rating(self, client_rating):
-		self.client_rating = client_rating
-		jsonIO.set_value(self.db, self.id, "client_rating", client_rating)
-		return 1
+		if client_rating <= 5 and client_rating >= 1:
+			self.client_rating = client_rating
+			jsonIO.set_value(self.db, self.id, "client_rating", client_rating)
+			return 1
+		else:
+			print(client_rating, " is not a valid entry, rating must be between 1 and 5")
+			return 0
 	def set_team_rating(self, team_rating):
-		team_rating = team_rating
-		jsonIO.set_value(self.db, self.id, "team_rating", team_rating)
-		return 1
+		if team_rating <= 5 and team_rating >= 1:
+			team_rating = team_rating
+			jsonIO.set_value(self.db, self.id, "team_rating", team_rating)
+			return 1
+		else:
+			print(team_rating, " is not a valid entry, rating must be between 1 and 5")
+			return 0
 	def set_status(self, status):
 		self.status = status
 		jsonIO.set_value(self.db, self.id, "status", status)
