@@ -2,7 +2,7 @@ from User import *
 from Project import *
 from Team import *
 from Bid import *
-from Task import *
+from Issue import *
 import ezcommands as ez
 from datetime import *
 
@@ -20,10 +20,10 @@ user2 = User()
 user3 = User()
 user4 = User()
 
-t0 = Team()
-t1 = Team()
-t2 = Team()
-t3 = Team()
+team0 = Team()
+team1 = Team()
+team2 = Team()
+team3 = Team()
 
 client0 = User()
 client1 = User()
@@ -43,10 +43,10 @@ bid2 = Bid()
 bid3 = Bid()
 bid4 = Bid()
 
-task0 = Task()
-task1 = Task()
-task2 = Task()
-task3 = Task()
+issue0 = Issue()
+issue1 = Issue()
+issue2 = Issue()
+issue3 = Issue()
 
 def reload():
 	super_user.load_db(0)
@@ -55,10 +55,10 @@ def reload():
 	user3.load_db(3)
 	user4.load_db(4)
 
-	t0.load_db(0)
-	t1.load_db(1)
-	t2.load_db(2)
-	t3.load_db(3)
+	team0.load_db(0)
+	team1.load_db(1)
+	team2.load_db(2)
+	team3.load_db(3)
 
 	client0.load_db(5)
 	client1.load_db(6)
@@ -78,10 +78,10 @@ def reload():
 	bid3.load_db(3)
 	bid4.load_db(4)
 	
-	task0.load_db(0)
-	task1.load_db(1)
-	task2.load_db(2)
-	task3.load_db(3)
+	issue0.load_db(0)
+	issue1.load_db(1)
+	issue2.load_db(2)
+	issue3.load_db(3)
 
 def run():
 	super_user.new_user(name = "System Admin", username = "admin", password = "pass", user_type = "admin",  balance = 100)
@@ -90,10 +90,10 @@ def run():
 	user3.new_user(name = "Cow", username = "can", password = 'code?', user_type = "dev", balance = 30)
 	user4.new_user(name = "Loner", username = "Loner", password = 'in_corner', user_type = "dev", balance = 40)
 
-	t0.new_team(admin_ids = [user1.get_id()], dev_ids = [user1.get_id(), user2.get_id()], name = "Controlled") 
-	t1.new_team(admin_ids = [user1.get_id()], dev_ids = [user1.get_id(), user2.get_id()], name = "WallStreet, where many things can go wrong")
-	t2.new_team(admin_ids = [user2.get_id()], dev_ids = [user2.get_id()], name = "One Cow Team")
-	t3.new_team(admin_ids = [user4.get_id()], dev_ids = [user4.get_id()], name = "Rainbow Darkness")
+	team0.new_team(admin_ids = [user1.get_id()], dev_ids = [user1.get_id(), user2.get_id()], name = "Controlled") 
+	team1.new_team(admin_ids = [user1.get_id()], dev_ids = [user1.get_id(), user2.get_id()], name = "WallStreet, where many things can go wrong")
+	team2.new_team(admin_ids = [user2.get_id()], dev_ids = [user2.get_id()], name = "One Cow Team")
+	team3.new_team(admin_ids = [user4.get_id()], dev_ids = [user4.get_id()], name = "Rainbow Darkness")
 
 	client0.new_user(name = "controlled", username = "controlled", password = "controlled", user_type = "client", balance = 10, project_ids = [0])
 	client1.new_user(name = "Jack Sparrow", username = "Fish", password = "cat", user_type = "client", balance = 10, project_ids = [0,1,2,3])
@@ -101,19 +101,19 @@ def run():
 	client3.new_user(name = "Rick", username = "mr", password = 'meeseeks', user_type = "client", balance = 30)
 	client4.new_user(name = "Morty", username = "rick", password = 'adventure', user_type = "client", balance = 40)
 
-	project0.new_project(client_id = client0.get_id(), title = "controlled", desc = "controlled", start_date = now, end_date = later, team_id = 0)
-	project1.new_project(client_id = client1.get_id(), title = "Hello", desc = "I have a lot of money", start_date = now, end_date = later, team_id = t1.get_id())
-	project2.new_project(client_id = client1.get_id(), title = "World", desc = "I have a lot of money, too?", start_date = now, end_date = later, team_id = t2.get_id())
-	project3.new_project(client_id = client1.get_id(), title = "Goodbye", desc = "I have more money than the other guy", start_date = now, end_date = later, team_id = t3.get_id())
-	project4.new_project(client_id = client1.get_id(), title = "VR", desc = "Don't listen to any of them, I have the most", start_date = now, end_date = later, team_id = t3.get_id())
+	project0.new_project(client_id = client0.get_id(), title = "controlled", desc = "controlled",  deadline = later, team_id = 0)
+	project1.new_project(client_id = client1.get_id(), title = "Hello", desc = "I have a lot of money",  deadline = later, team_id = team1.get_id())
+	project2.new_project(client_id = client1.get_id(), title = "World", desc = "I have a lot of money, too?", deadline = later, team_id = team2.get_id())
+	project3.new_project(client_id = client1.get_id(), title = "Goodbye", desc = "I have more money than the other guy", deadline = later, team_id = team3.get_id())
+	project4.new_project(client_id = client1.get_id(), title = "VR", desc = "Don't listen to any of them, I have the most", deadline = later, team_id = team3.get_id())
 
-	bid0.new_bid(project_id = project1.get_id(), end_date=later, initial_bid = 10)
-	bid1.new_bid(project_id = project1.get_id(), end_date=now, initial_bid = 1000)
-	bid2.new_bid(project_id = project2.get_id(), end_date=now, initial_bid = 1000)
-	bid3.new_bid(project_id = project3.get_id(), end_date=now, initial_bid = 1000)
-	bid4.new_bid(project_id = project4.get_id(), end_date=now, initial_bid = 1000)
+	bid0.new_bid(project_id = project1.get_id(), bid_log = [[now, client0.get_id(), 1000, later]])
+	bid1.new_bid(project_id = project1.get_id(), bid_log = [[now, client0.get_id(), 1000, later]])
+	bid2.new_bid(project_id = project2.get_id(), bid_log = [[now, client0.get_id(), 1000, later]])
+	bid3.new_bid(project_id = project3.get_id(), bid_log = [[now, client0.get_id(), 1000, later]])
+	bid4.new_bid(project_id = project4.get_id(), bid_log = [[now, client0.get_id(), 1000, later]])
 	
-	task0.new_issue(referred_id = 1, issue_desc ="new user")
-	task1.new_issue(referred_id = 2, issue_desc ="new user", admin_comment = "user denied", date_resolved = now)
-	task2.new_issue(referred_id = 2, issue_desc ="new user")
-	task3.new_issue(referred_id = 5, issue_desc ="quit request")
+	issue0.new_issue(referred_id = 1, issue_desc ="new user")
+	issue1.new_issue(referred_id = 2, issue_desc ="new user", admin_review = "user denied", date_resolved = now)
+	issue2.new_issue(referred_id = 2, issue_desc ="new user")
+	issue3.new_issue(referred_id = 5, issue_desc ="quit request")

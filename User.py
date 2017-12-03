@@ -40,13 +40,13 @@ class User:
 		self.resume = resume
 		self.pic = pic
 		self.interest = interest
-		if issue_ids and issue_ids!= None:
+		if issue_ids:
 			self.issue_ids = list(issue_ids)
 		else:
 			self.issue_ids = []
 		#for registered only
 		self.team_id = team_id
-		if project_ids and project_ids!= None:
+		if project_ids:
 			self.project_ids = list(project_ids) #list of project ids that has been worked or active
 		else:
 			self.project_ids = []
@@ -169,7 +169,7 @@ class User:
 			return 1
 		return 0
 	def set_Issue_ids(self, issue_ids):
-		if issue_ids and issue_ids!= None:
+		if issue_ids:
 			self.issue_ids = list(issue_ids)
 			jsonIO.set_value(self.db, self.id, "issue_ids", self.issue_ids)
 			return 1
@@ -187,7 +187,7 @@ class User:
 			return 1
 		return 0
 	def set_project_ids(self, project_ids):
-		if project_ids and project_ids!= None:
+		if project_ids:
 			self.project_ids = list(project_ids)
 			jsonIO.set_value(self.db, self.id, "project_ids", self.project_ids)
 			return 1

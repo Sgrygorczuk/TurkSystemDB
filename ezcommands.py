@@ -2,7 +2,7 @@ from User import *
 from Project import *
 from Team import *
 from Bid import *
-from Task import *
+from Issue import *
 from jsonIO import *
 import inspect
 import numpy
@@ -53,17 +53,27 @@ Class creation
 	user_exists(username): returns 1 if user exist else returns 0
 	register_user(name, username, password, user_type, deposit):
 		places new temp_user in SU tasks
-	create_project(client_id, title, desc, start_date, end_date):
+	create_bid(project_id, end_date, initial_bid, start_date = now):
+	
+	create_project(client_id, title, desc, deadline):
 		will return and make a new project
-	create_bid(project_id, start_date, end_date, initial_bid): returns a new bid
+	create_bid(project_id, end_date, initial_bid, start_date = now): returns a new bid
 	*not made*create_issue()
 -------------------------------------------------------------------------------------
 Special functions
-	roject_fund_transfer(from_user_id, to_user_id, amount): it will modify both 
+	project_fund_transfer(from_user_id, to_user_id, amount): it will modify both 
 		 balances and create task. Check below for more details.
+	erase_empty_team(team_id): will delete team if there is no admin and return true
+		will also kick developers out and update their team_id to 'Nan'
+        else it will return false
+	kick(team_dict, user_id):  will remove user from team and update both user and team db
+	request_join(team_dict, user_id):  will add user to the team and update team's dev_ids
+	accept_team(team_dict, user_id): user's team_id will be updated and team's request list will shrink
+	reject_team(team_dict, user_id): team's request list will shrink
 	*not made*start_bid
-	*not made*make_bid
+	*not made*bid_process
 	*not made*end_bid: make needed modifications such as penalty or set_team_id
+	*not made*rate
 -------------------------------------------------------------------------------------
 Metrics
 	get_grade(obj,user,dic=false): returns the average rating of dev, team, or client
@@ -79,9 +89,8 @@ Helper functions
 	get_n_days_later(time, n): return string with added days 
 	tranfer_funds(from_user, to_user, amount): it will modify both balances
 	is_admin(dic): returns true if user is team admin
-	erase_empty_team(team_id): will delete team if there is no admin and return true
-		will also kick developers out and update their team_id to 'Nan'
-        else it will return false''')
+	promote(team_dict, user_id): user becomes admin in team
+	demote(team_dict, user_id): admin becomes user''')
 #############################################################################
 
 #/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\
@@ -269,7 +278,7 @@ def verify(username, password = None):
 	#modify user status
 	#modify task (approved/denied)
 def quit_request(issue_id):
-    issue = jsonIO.get_row("task_db", issue_id)
+    issue = jsonIO.get_row("issue_db", issue_id)
     if not issue:
         print ("The issue you are grabbing from does not exist")
         return ""
@@ -297,21 +306,21 @@ def quit_request(issue_id):
             elif user.get_user_type() == "client":
                 if jsonIO.get_value("bid_db", project["id"], "status") == "active":
                     message = "The client is in the middle of a bid"
-        #remove from team (admin/dev_ids)
-        if user.get_team_id():
-            quit_team(user_id)
+            #remove from team (admin/dev_ids)
+            elif user.get_team_id():
+                quit_team(user_id)
     if not message:
         message = "Done"
     #modify user status
     jsonIO.set_value("user_db", user_id, "status", "inactive") 
-    #MUST modify the task
-    issue["admin_comment"] = message
+    #MUST modify the issue
+    issue["admin_review"] = message
     issue["date_resolved"] = now
     issue["resolved"] = True
-    jsonIO.set_row("task_db", issue)
+    jsonIO.set_row("issue_db", issue)
     return message
 	
-#cond: will delete user but wont update the task_db
+#cond: will delete user but wont update the issue_db
 #pre: user_id must exist
 #	  must not be in the middle of a project
 #     must belong to a team
@@ -327,26 +336,26 @@ def quit_team(user_id):
 	if user["project_ids"]:
 		if jsonIO.get_value("project_db", user["project_ids"][-1], "status") == "active":
 			message = "The user is in the middle of a project"
+			return message
 	#check if user is in team
-	else:
-		team = jsonIO.get_row("team_db", user["team_id"])
-		if not team:
-			print ("User does not belong to a team")
-			return ""
-		#if it is an admit, remove him
-		for admin in team["admin_ids"]:
-			if admin == user_id:
-				jsonIO.set_value("team_db", project["id"], "admin_ids",
-								team["admin_ids"].remove(user_id))
-		#support function see bottom
-		#delete if he was the last admin and kick devs out
-		if not erase_empty_team(team["id"]):
-			#team not yet erased
-			for dev in team["dev_ids"]:
-				if dev == user_id:
-					jsonIO.set_value("team_db", team["id"], "dev_ids", team["dev_ids"].remove(user_id))
-		#modify user status
-		jsonIO.set_value("user_db", user_id, "team_id", 'Nan')
+	team = jsonIO.get_row("team_db", user["team_id"])
+	if not team:
+		print ("User does not belong to a team")
+		return ""
+	#if it is an admit, remove him
+	for admin in team["admin_ids"]:
+		if admin == user_id:
+			jsonIO.set_value("team_db", team["id"], "admin_ids",
+							team["admin_ids"].remove(user_id))
+	#support function see bottom
+	#delete if he was the last admin and kick devs out
+	if not erase_empty_team(team["id"]):
+		#team not yet erased
+		for dev in team["dev_ids"]:
+			if dev == user_id:
+				jsonIO.set_value("team_db", team["id"], "dev_ids", team["dev_ids"].remove(user_id))
+	#modify user team_id to 'Nan'
+	jsonIO.set_value("user_db", user_id, "team_id", 'Nan')
 	if message == "":
 		message = "Done"
 	return message
@@ -360,7 +369,7 @@ def user_exists(username):
     return 1 if find_row("user_db", "username", username) else 0
 
 #pre: takes required attribute of new user, username should not exist
-#post: places new temp_user in SU tasks or return message
+#post: places new temp_user in SU issues or return message
 def register_user(name, username, password, user_type, deposit):
     #empty inputs
     if username == "":
@@ -392,89 +401,93 @@ def register_user(name, username, password, user_type, deposit):
             #check deposit amount
             if deposit <= 0:
                 return "The deposit is too low"
-			#create User and Task
+			#create User and Ussue
             print ("User made")
             user = User(name, username, password, user_type, "temp", deposit)
             return [user,
-                    Task(user.get_id(),"new user")]
+                    Issue(user.get_id(),"new user")]
 		#this was when deposit was not right syntax
         except ValueError:
             return "That is not a valid deposit"
 
 #pre: needs all the entries filled and an existing client id
 #post: will return and make a new project, and add project_id to client
-def create_project(client_id, title, desc, start_date, end_date):
-    #check empty
-    if title == "":
-        return "Title field is empty"
-    if desc == "":
-        return "Description field is empty"
-    if start_date == "":
-        return "Start date field is empty"
-    if end_date == "":
-        return "End date field is empty"
-    if not find_row("user_db","id", client_id):
-        print("User not found")
-        return 'Nan'
-    #make sure end time > start time
-    #uses helper_function
-    s_date = string_to_datetime(start_date)
-    e_date = string_to_datetime(end_date)
-    if s_date >= e_date:
-        return "The end date must be after the start date"
-    project = Project(client_id, title, desc, start_date, end_date)
-    client = User()
-    client.load_db(client_id)
-    client.add_project_ids(project.get_id())
-    return project
+def create_project(client_id, title, desc, deadline):
+	#check empty
+	if title == "":
+		return "Title field is empty"
+	if desc == "":
+		return "Description field is empty"
+	if deadline == "":
+		return "End date field is empty"
+	if not find_row("user_db","id", client_id):
+		print("User not found")
+		return 'Nan'
+	#make sure string is a valid date
+	#uses helper_function
+	e_date = string_to_datetime(deadline)
+	if not e_date:
+		return 'Nan'
+	#make sure end time > start time 
+	if dt_now >= e_date:
+		return "The end date must be after the start date"
+	project = Project(client_id, title, desc, deadline)
+	client = User()
+	client.load_db(client_id)
+	client.add_project_ids(project.get_id())
+	return project
 
 #pre: must have client and project id for input and bid_id must be new
 #    end>start date and client's balance >= bid
 #post: returns a new bid
-def create_bid(project_id, start_date, end_date, initial_bid):
-    #check empty
-    if start_date == "":
-        print("Start date field is empty")
-        return 'Nan'
-    if end_date == "":
-        return "End date field is empty"
-    #check amount is positive
-    if initial_bid < 0:
-        return "Initial bid must be positive"
-    #check id consistencies
-    project = jsonIO.get_row("project_db", project_id)
-    if not project:
-        print("Project not found")
-        return 'Nan'
-    bid = jsonIO.get_row("bid_db", project_id)
-    if bid:
-        print("Bid already exists")
-        return 'Nan'
-    user = jsonIO.get_row("user_db", project["client_id"])
-    if not user:
-        print("User not found")
-        return 'Nan'
-    #make sure client has money
-    if float(user["balance"]) < initial_bid:
-        return "User does not have enough funds"
-    #make sure end time > start time
+def create_bid(project_id, end_date, initial_bid, start_date = now):
+	#check empty
+	if start_date == "":
+		print("Start date field is empty")
+		return 'Nan'
+	if end_date == "":
+		return "End date field is empty"
+	#check amount is positive
+	if initial_bid < 0:
+		return "Initial bid must be positive"
+	#check id consistencies
+	project = jsonIO.get_row("project_db", project_id)
+	if not project:
+		print("Project not found")
+		return 'Nan'
+	bid = jsonIO.get_row("bid_db", project_id)
+	if bid:
+		print("Bid already exists")
+		return 'Nan'
+	user = jsonIO.get_row("user_db", project["client_id"])
+	if not user:
+		print("User not found")
+		return 'Nan'
+	#make sure client has money
+	if float(user["balance"]) < initial_bid:
+		return "User does not have enough funds"
+	#make sure end time > start time
 	#uses helper_function
-    s_date = string_to_datetime(start_date)
-    e_date = string_to_datetime(end_date)
-    if s_date >= e_date:
-        return "The end date must be after the start date"
-    return Bid(project_id, start_date, end_date, initial_bid)
+	s_date = string_to_datetime(start_date)
+	e_date = string_to_datetime(end_date)
+	#make sure string is a valid date
+	#uses helper_function
+	if not s_date or not e_date:
+		return 'Nan'
+	if s_date >= e_date:
+		return "The end date must be after the start date"
+	return Bid(project_id, [start_date, user["id"], initial_bid, end_date])
 	
 	
 #/\/\/\/\SPECIAL FUNCTIONS/\/\/\/\SPECIAL FUNCTIONS/\/\/\/\SPECIAL FUNCTIONS/\/\/\/\ 
 
 #cond: this is called at the beginning after the bid is done
 #      the SU will withdraw the money and take 10% then give
-#      half of the money to the team, and will add to SU task.
+#      half of the money to the team, and will add to SU issues.
 #      It will be set as resolved, and set as unresolved when
 #      the team submits their work or until the deadline.
 #pre: from, to users exist and amount exists and is valid
-#post: it will modify both balances and create task.
+#post: it will modify both balances and create issue.
 def project_fund_transfer(from_user_id, to_user_id, amount):
 	from_user = User()
 	to_user = User()
@@ -492,7 +505,7 @@ def project_fund_transfer(from_user_id, to_user_id, amount):
 		return "The user does not have enough funds"
 	if not from_user.get_project_ids:
 		return "The client has not initiated a project"
-	#create a new Task after money transfers
+	#create a new Issue after money transfers
 	from_user.withdraw(amount)
 	#take 10% and take 50% until completion of project
 	deduction = round(amount*.1*.5, 2)
@@ -500,10 +513,77 @@ def project_fund_transfer(from_user_id, to_user_id, amount):
 	#keep it in superuser's bank
 	jsonIO.set_value("user_db", 0, "balance", deduction)
 	to_user.deposit(amount)
-	#create a new task to retrieve the other 40% = 50%-10# fee
-	return Task(from_user.get_project_ids[-1], "new project", True)
+	#create a new issue to retrieve the other 40% = 50%-10# fee
+	return Issue(from_user.get_project_ids[-1], "new project", True)
 	
-	
+#cond: will erase if there is no admin and return a truth
+#pre: the team_id is valid
+#post: will delete team if there is no admin and return true
+#      will also kick developers out and update their team_id to 'Nan'
+#      else it will return false
+def erase_empty_team(team_id):
+	team = jsonIO.get_row("team_db", team_id)
+	if not team:
+		print ("Team does not exist")
+		return 0
+	if team["admin_ids"]:
+		return 0
+	if team["dev_ids"]:
+		for dev_id in team["dev_ids"]:
+			jsonIO.set_value("user_db", dev_id, "team_id", 'Nan')
+	jsonIO.del_row("team_db", team_id)
+	return 1
+
+#pre: team and user must exit
+#pro: will remove user from team and update both user and team db
+def kick(team_dict, user_id):
+	team_dict["dev_ids"].remove(user_id)
+	user = jsonIO.get_row("user_db", user_id)
+	if user:
+		if is_admin(user):
+			team_dict["admin_ids"].remove(user_id)
+		user["team_id"] = "Nan"
+		set_row("user_db", user)
+		set_row("team_db", team_dict)
+		return 1
+	print("User does not exist")
+	return 0
+
+#pre:  team and user must exist
+#post: will add user to the team and update team's dev_ids
+def request_join(team_dict, user_id):  
+	team_dict["join_request_ids"].append(user_id)
+	user = jsonIO.get_row("user_db", user_id)
+	if user:
+		user["team_id"] = team_dict["id"]
+		print(user["team_id"])
+		set_row("user_db", user)
+		set_row("team_db", team_dict)
+		return user
+	print("User does not exist")
+	return 'Nan'
+
+#cond: accepts the user from the join request list
+#pre: team and user exists
+#post: user's team_id will be updated and team's request list will shrink
+def accept_team(team_dict, user_id):
+	team_dict["dev_ids"].append(user_id)
+	team_dict["join_request_ids"].remove(user_id)
+	user = jsonIO.get_row("user_db", user_id)
+	user["team_id"] = team_dict["id"]
+	set_row("user_db", user)
+	set_row("team_db", team_dict)
+
+#cond: rejects the user from the join request list
+#pre: team and user exists
+#post: team's request list will shrink
+def reject_team(team_dict, user_id):
+	team_dict["join_request_ids"].remove(user_id)
+	user = jsonIO.get_row("user_db", user_id)
+	user["team_id"] = "Nan"
+	set_row("user_db", user)
+	set_row("team_db", team_dict)
+
 #/\/\/\/\METRICS/\/\/\/\METRICS/\/\/\/\METRICS/\/\/\/\METRICS/\/\/\/\METRICS/\/\/\/\
 #cond: dev    avg (dev,"team")
 #      team   avg (team,"team")
@@ -592,7 +672,7 @@ def string_to_datetime(time):
 		return datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
 	except:
 		print("String not in Y-m-d H:M:S form")
-		return 'Nan'
+		return None
 
 #pre: needs datetime in Y-m-d H:M:S form
 #post: returns string form
@@ -632,35 +712,37 @@ def tranfer_funds(from_user_id, to_user_id, amount):
 	from_user.withdraw(amount)
 	to_user.deposit(amount)
 	return 1
-	
+
+#pre: user must exist
+#pro: check if user is active
+def is_in_active_project(user):
+   if len(user["project_ids"]) > 0:
+	   id = user["project_ids"][len(user["project_ids"]) - 1]
+	   project = jsonIO.get_row("project_db", id)
+	   if project["status"] == "active":
+		   return True
+	   else:
+		   return False
+   return False
+  
 #cond: dict will contain a dict of user (has "team_id and id")
 #pre: team_id must exits
 #post: returns team admin
 def is_admin(dict):
    if dict["team_id"] == "Nan":
-       return False
+	   return False
    else:
-       team = get_row(Team(), dict["team_id"])
-       for admin in team["admin_ids"]:
-           if dict["id"] == admin:
-               return True
-			   
-#cond: will erase if there is no admin and return a truth
-#pre: the team_id is valid
-#post: will delete team if there is no admin and return true
-#      will also kick developers out and update their team_id to 'Nan'
-#      else it will return false
-def erase_empty_team(team_id):
-	team = jsonIO.get_row("team_db", team_id)
-	if not team:
-		print ("Team does not exist")
-		return 0
-	if team["admin_ids"]:
-		return 0
-	if team["developer_ids"]:
-		for dev_id in team["developer_ids"]:
-			jsonIO.set_value("user_db", "team_id", 'Nan')
-	jsonIO.del_row("team_db", team_id)
-	return 1
-	
-	
+	   team = get_row(Team(), dict["team_id"])
+	   for admin in team["admin_ids"]:
+		   if dict["id"] == admin:
+			   return True
+
+#post: user becomes admin in team
+def promote(team_dict, user_id):
+   team_dict["admin_ids"].append(user_id)
+   set_row("team_db", team_dict)
+
+#post: admin becomes user
+def demote(team_dict, user_id):
+   team_dict["admin_ids"].remove(user_id)
+   set_row("team_db", team_dict)
