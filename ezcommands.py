@@ -393,20 +393,20 @@ def register_user(name, username, password, user_type, deposit):
     else:
         try:
             val = float(deposit)
+            #check deposit amount
+            if val <= 0:
+                return "The deposit is too low"
             #check deposit syntax
             val = str(deposit)
             if '.' in val:
                 if len(val.rsplit('.')[-1]) > 2:
                     return "That is not a valid deposit"
-            #check deposit amount
-            if deposit <= 0:
-                return "The deposit is too low"
-			#create User and Ussue
+            #create User and Ussue
             print ("User made")
-            user = User(name, username, password, user_type, "temp", deposit)
-            return [user,
-                    Issue(user.get_id(),"new user")]
-		#this was when deposit was not right syntax
+            user = User(name = name, username = username, password = password, user_type = user_type, balance = float(deposit), status = "temp")
+            Issue(user.get_id(),"new user")
+            return user.get_all()
+        #this was when deposit was not right syntax
         except ValueError:
             return "That is not a valid deposit"
 
