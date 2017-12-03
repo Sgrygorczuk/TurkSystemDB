@@ -4,6 +4,8 @@ from Team import *
 from Bid import *
 from Issue import *
 from jsonIO import *
+import os
+import shutil
 import inspect
 import numpy
 
@@ -90,7 +92,11 @@ Helper functions
 	tranfer_funds(from_user, to_user, amount): it will modify both balances
 	is_admin(dic): returns true if user is team admin
 	promote(team_dict, user_id): user becomes admin in team
-	demote(team_dict, user_id): admin becomes user''')
+	demote(team_dict, user_id): admin becomes user
+	get_files(src, file = None, dst = os.getcwd(), username = None,
+		init_path = "C:/Users/username/Desktop"):
+		will either return available files if file not stated
+		else copies a new file from folder to folder''')
 #############################################################################
 
 #/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\
@@ -746,3 +752,29 @@ def promote(team_dict, user_id):
 def demote(team_dict, user_id):
    team_dict["admin_ids"].remove(user_id)
    set_row("team_db", team_dict)
+  
+#cond:  if file is not defined, it will just print what is in the path
+#		if file is defined we copy the file to to_path
+#		if username is defined, we use the init_path
+#       if to_path does not exist, it will create it
+#pre: needs valid path
+#post: will either return available files if file not stated
+#   else copies a new file
+def get_files(src, file = None, dst = os.getcwd(), username = None, init_path = "C:/Users/username/Desktop"):
+	#if a username is defined use it as a initial_path, so path = initial_path + path
+	if username:
+		init_path = init_path.replace("username", username)
+		src = init_path+"/"+src
+	#if only path it will print availble files
+	if not file:
+		list = os.listdir(src)
+		print (list)
+		return list
+	if not os.path.exists(os.path.join(src,file)):
+		print("The file path:", os.path.join(src,file), "does not exist")
+		return "Nan"
+	if not os.path.exists(dst):
+		print("Directory does not exist, so making a new one")
+		os.mkdir(dst)
+	print("File copied")
+	return shutil.copy(os.path.join(src, file), dst)
