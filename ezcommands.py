@@ -7,6 +7,9 @@ from jsonIO import *
 import inspect
 import numpy
 
+now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+dt_now = datetime.strptime(now, "%Y-%m-%d %H:%M:%S")
+
 ##########################################################################
 ##########################################################################
 ########						NOTES:							  ########
@@ -24,59 +27,68 @@ import numpy
 ##########################################################################
 
 ###########################DIRECTORY OF FUNCTIONS#########################
-#Direct Databse access
-#get_value(obj, key, id = 'Nan'): gets value
-#get_all_db(obj): gets all from db
-#get_row(obj, key): gets an entire row
-#print_table(m): prints the table given a dictionary or a list of it
-#----------------------------------------------------------------------------
-#SU
-#user_report(user, id = 'Nan'): returns status of the user:
-#                               user_type, status, warning, and balance
-#verify(username, password = ""): returns [case number, user, message]
-#project_completion : decides what to do after project is completed
-#                     users rate each other:
-#							what to do with bid money
-#							blaklist users
-#                     and other modifications
-#quit_request:
-#dissolve_team:
-#quit_team:
-#----------------------------------------------------------------------------
-#Class creation
-#user_exists(username): returns 1 if user exist else returns 0
-#register_user(name, username, password, user_type, deposit):
-#              places new temp_user in SU tasks
-#create_project(): will return and make a new project
-#create_bid(project_id, start_date, end_date, initial_bid): returns a new bid
-#---------------------------------------------------------------------------
-#Special functions
-#project_fund_transfer(from_user, to_user, amount): it will modify both 
-#             balances and create task. Check below for more details.
-#start_bid
-#make_bid
-#end_bid: make needed modifications such as penalty or set_team_id
-#----------------------------------------------------------------------------
-#Metrics
-#get_grade(obj,user,dic=false): returns the average rating of dev, team, or client
-#get_total_commision(obj,user,dic=false): returns the money made by all projects from user/ team
-#----------------------------------------------------------------------------
-#Helper functions
-#find_row(db, key, value): returns row of given key value
-#val_print(values): support method for print_table method
-#get_time(): returns current date time in Y-m-d H:M:S form
-#string_to_datetime(time): returns datetime form
-#datetime_to_string(dt_time): returns string form
-#get_n_days_later(time, n): return string with added days 
-#tranfer_funds(from_user, to_user, amount): it will modify both balances
-#is_admin(dic): returns true if user is team admin
+#post: prints all available commands
+def get_commands():
+	print ('''-------------------------------------------------------------------------------------
+Direct Databse access
+	get_value(obj, key, id = 'Nan'): gets value
+	get_all_db(obj): gets all from db
+	get_row(obj, key): gets an entire row
+	print_table(m): prints the table given a dictionary or a list of it
+-------------------------------------------------------------------------------------
+SU
+	user_report(user, id = 'Nan'): returns status of the user:
+		user_type, status, warning, and balance
+	verify(username, password = ""): returns [case number, user, message]
+	*not made*project_completion : decides what to do after project is completed
+		users rate each other:
+				what to do with bid money
+				blaklist users
+		and other modifications
+	quit_request: user is removed and will call quit_team
+	quit_team: doesnt matter if admin or user, but will kick devs if he's last admin
+		and update their team_ids
+-------------------------------------------------------------------------------------
+Class creation
+	user_exists(username): returns 1 if user exist else returns 0
+	register_user(name, username, password, user_type, deposit):
+		places new temp_user in SU tasks
+	create_project(client_id, title, desc, start_date, end_date):
+		will return and make a new project
+	create_bid(project_id, start_date, end_date, initial_bid): returns a new bid
+	*not made*create_issue()
+-------------------------------------------------------------------------------------
+Special functions
+	roject_fund_transfer(from_user_id, to_user_id, amount): it will modify both 
+		 balances and create task. Check below for more details.
+	*not made*start_bid
+	*not made*make_bid
+	*not made*end_bid: make needed modifications such as penalty or set_team_id
+-------------------------------------------------------------------------------------
+Metrics
+	get_grade(obj,user,dic=false): returns the average rating of dev, team, or client
+	get_total_commision(obj,user,dic=false): returns the money made 
+		by all projects from user/ team
+-------------------------------------------------------------------------------------
+Helper functions
+	find_row(db, key, value): returns row of given key value
+	val_print(values): support method for print_table method
+	get_time(): returns current date time in Y-m-d H:M:S form
+	string_to_datetime(time): returns datetime form
+	datetime_to_string(dt_time): returns string form
+	get_n_days_later(time, n): return string with added days 
+	tranfer_funds(from_user, to_user, amount): it will modify both balances
+	is_admin(dic): returns true if user is team admin
+	erase_empty_team(team_id): will delete team if there is no admin and return true
+		will also kick developers out and update their team_id to 'Nan'
+        else it will return false''')
 #############################################################################
 
 #/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\DIRECT DATABASE ACCESS/\/\/\/\
 
 #pre: given an instance of a class, key, and id (unless id is initialized in object)
 #post: get attribute from a class 
-#	   else return None
+#	   else return 'Nan'
 #ex: get_value(User(), "name", 0)
 #	 returns: System Admit
 def get_value(obj, key, id = 'Nan'):
@@ -84,10 +96,10 @@ def get_value(obj, key, id = 'Nan'):
         id = obj.get_id()
         if not key:
             print("Key not stated")
-            return None
+            return 'Nan'
         elif id == 'Nan':
             print("ID not initialized")
-            return None
+            return 'Nan'
         else:
             #can pull from user
             method = 'get_'+key
@@ -96,7 +108,7 @@ def get_value(obj, key, id = 'Nan'):
                 return value
             except:
                 print("No such key exist")
-                return None
+                return 'Nan'
     #otherwise just search db
     value = jsonIO.get_value(obj.db, id, key)
     if value == None:
@@ -108,19 +120,19 @@ def get_all_db(obj):
 
 #pre: id must exist	(must include id unless id is initialized in object)
 #post: returns all attribute of class
-#      else return None
+#      else return {}
 def get_row(obj, id = 'Nan'):
 	if id == 'Nan':
 		id = obj.get_id()
 		if id == 'Nan':
 			print("ID not initialized")
-			return None
+			return {}
 		else:
 			#can pull from user
 			return obj.get_all()
 	elif isinstance(id, str):
 		print("ID does not exits")
-		return None
+		return {}
 	#otherwise just search db
 	return jsonIO.get_row(obj.db, id)
 	
@@ -169,23 +181,23 @@ def print_table(m):
 			   
 #pre: needs a valid user of type user and could also do it from an id
 #post: returns dictionary of status of the user: user_type, status, warning, and balance
-#else returns None
+#else returns {}
 def user_report(user, id = 'Nan'):
 	if user.__class__ != User:
 		print("User is not of type User")
-		return None
+		return {}
 	if id == 'Nan':
 		id = user.get_id()
 		if id == 'Nan':
 			print("ID not initialized")
-			return None
+			return {}
 		else:
 			#can pull from user
 			return {"user_type":user.get_user_type(), "status":user.get_status(),
 			"warning":user.get_warning(), "balance":user.get_balance()}
 	obj = jsonIO.get_row(user.db, id)
 	if obj == None:
-		return None
+		return {}
 	return {"user_type":obj["user_type"], "status":obj["status"],
 	"warning":obj["warning"], "balance":obj["balance"]}
 
@@ -195,54 +207,151 @@ def user_report(user, id = 'Nan'):
 #pre: none
 #post: will return [case number, user, message] along with a print
 def verify(username, password = None):
-    case = 1
-    user = {}
-    message = ""
-    #empty inputs
-    if not username:
-        message = "Username field is empty"
-    elif password == "":
-        case = 2
-        message = "Password field is empty"
-    else:
-        #check without password
+	case = 1
+	user = {}
+	message = ""
+	#empty inputs
+	if not username:
+		message = "Username field is empty"
+	elif password == "":
+		case = 2
+		message = "Password field is empty"
+	else:
+		#check without password
 		#find_row is a helper function (can be found all the way below)
-        user = find_row("user_db", "username", username)
-        if not user:
-            case = 3
-            message = "Username not found"
-        elif user["status"] == "blacklisted":
-            case = 4
-            message = "User found but blacklisted"
-        elif password == None:
-            if user["warning"] == 2:
-                if user["status"] != "blacklisted":
-                    case = 5
-                    message = "User found, but has 2 warnings and not yet black listed"
-                #blacklisted already checked
-            elif user["status"] == "rejected":
-                case = 6
-                message = "Temporary user was rejected and password not yet verified"
-            else:
-                case = 7
-                message = "User has no warnings and password not yet verified"
-        #check with password
-        elif user["password"] != password:
-            case = 8
-            message = "Your password does not match"
-        elif user["warning"] == 2:
-            if user["status"] != "blacklisted":
-                case = 9
-                message = "Login successful, but has 2 warnings and not yet black listed"
-        elif user["status"] == "rejected":
-                case = 10
-                message = "Login successful, but temporary user was rejected"
-        else: #user["password"] matches
-            case = 0
-            message = "Login successful"
-    print(message)
-    return [case, user, message]
+		user = find_row("user_db", "username", username)
+		if not user:
+			case = 3
+			message = "Username not found"
+		elif user["status"] == "blacklisted":
+			case = 4
+			message = "User found but blacklisted"
+		elif user["status"] == "inactive":
+			case = 5
+			message = "User found but deactivated"
+		elif password == None:
+			if user["warning"] == 2:
+				if user["status"] != "blacklisted":
+					case = 6
+					message = "User found, but has 2 warnings and not yet black listed"
+				#blacklisted already checked
+			elif user["status"] == "rejected":
+				case = 7
+				message = "Temporary user found, but was rejected and password"
+			else:
+				case = 8
+				message = "User found and has no warnings, password not yet verified"
+		#check with password
+		elif user["password"] != password:
+			case = 9
+			message = "Your password does not match"
+		elif user["warning"] == 2:
+			if user["status"] != "blacklisted":
+				case = 10
+				message = "Login successful, but has 2 warnings and not yet black listed"
+		elif user["status"] == "rejected":
+				case = 11
+				message = "Login successful, but temporary user was rejected"
+		else: #user["password"] matches
+			case = 0
+			message = "Login successful"
+	print(message)
+	return [case, user, message]
 	
+#cond:
+#pre:#check if balance == 0
+	#check if warnings == 2, then
+    #check if in the middle of a project
+#post:
+	#if not in middle of project
+		#remove from team (admin/dev_ids)
+		#remove from project (client)
+	#modify user status
+	#modify task (approved/denied)
+def quit_request(issue_id):
+    issue = jsonIO.get_row("task_db", issue_id)
+    if not issue:
+        print ("The issue you are grabbing from does not exist")
+        return ""
+    user_id = issue["referred_id"]
+    user = User()
+    user.load_db(user_id)
+    message = ""
+    #check user_id exist
+    if user.get_id() == 'Nan':
+        print ("The user you are grabbing from does not exist")
+        return ""
+    #check if balance == 0
+    if user.get_balance() != 0:
+        message = "The user has unresolved balance (balance is not 0)"
+    #check if warnings == 2
+    elif user.get_warning == 2:
+        message = "The user is or will be blacklisted"
+    #check if in the middle of a project
+    else:
+        if user.get_project_ids():
+            project = jsonIO.get_row("project_db", user.get_project_ids()[-1])
+            if project["status"] == "active":
+                message = "The user is in the middle of a project"
+            #check if client is managing a bid
+            elif user.get_user_type() == "client":
+                if jsonIO.get_value("bid_db", project["id"], "status") == "active":
+                    message = "The client is in the middle of a bid"
+        #remove from team (admin/dev_ids)
+        if user.get_team_id():
+            quit_team(user_id)
+    if not message:
+        message = "Done"
+    #modify user status
+    jsonIO.set_value("user_db", user_id, "status", "inactive") 
+    #MUST modify the task
+    issue["admin_comment"] = message
+    issue["date_resolved"] = now
+    issue["resolved"] = True
+    jsonIO.set_row("task_db", issue)
+    return message
+	
+#cond: will delete user but wont update the task_db
+#pre: user_id must exist
+#	  must not be in the middle of a project
+#     must belong to a team
+#post: will quit the team and will kick out devs if 
+#      this admin was the last one
+def quit_team(user_id):
+	user = jsonIO.get_row("user_db", user_id)
+	message = ""
+	if not user:
+		print ("User does not exist")
+		return ""
+	#check if in the middle of a project
+	if user["project_ids"]:
+		if jsonIO.get_value("project_db", user["project_ids"][-1], "status") == "active":
+			message = "The user is in the middle of a project"
+	#check if user is in team
+	else:
+		team = jsonIO.get_row("team_db", user["team_id"])
+		if not team:
+			print ("User does not belong to a team")
+			return ""
+		#if it is an admit, remove him
+		for admin in team["admin_ids"]:
+			if admin == user_id:
+				jsonIO.set_value("team_db", project["id"], "admin_ids",
+								team["admin_ids"].remove(user_id))
+		#support function see bottom
+		#delete if he was the last admin and kick devs out
+		if not erase_empty_team(team["id"]):
+			#team not yet erased
+			for dev in team["dev_ids"]:
+				if dev == user_id:
+					jsonIO.set_value("team_db", team["id"], "dev_ids", team["dev_ids"].remove(user_id))
+		#modify user status
+		jsonIO.set_value("user_db", user_id, "team_id", 'Nan')
+	if message == "":
+		message = "Done"
+	return message
+
+
 #/\/\/\/\CLASS CREATION/\/\/\/\CLASS CREATION/\/\/\/\CLASS CREATION/\/\/\/\
 
 #pre: none
@@ -251,34 +360,26 @@ def user_exists(username):
     return 1 if find_row("user_db", "username", username) else 0
 
 #pre: takes required attribute of new user, username should not exist
-#post: places new temp_user in SU tasks
+#post: places new temp_user in SU tasks or return message
 def register_user(name, username, password, user_type, deposit):
     #empty inputs
     if username == "":
-        print("Username field is empty")
-        return None
+        return "Username field is empty"
     elif user_exists(username):
-        print("That username already exists")
-        return None
+        return "That username already exists"
     elif password == "":
-        print("Password field is empty")
-        return None
+        return "Password field is empty"
     elif name == "":
-        print("Name field is empty")
-        return None
+        return "Name field is empty"
     #check values
     elif len(password) > 64:
-        print("That password is too long")
-        return None
+        return "That password is too long"
     elif len(name) > 80:
-        print("That name is too long")
-        return None
+        return "That name is too long"
     elif not name.isalpha():
-        print("That name has numbers or special charaters")
-        return None
+        return "That name has numbers or special charaters"
     elif user_type != "client" and user_type != "dev" and user_type!= "SU":
-        print("That is not a valid user type")
-        return None
+        return "That is not a valid user type"
     #see if deposit is a positive integer
     else:
         try:
@@ -287,12 +388,10 @@ def register_user(name, username, password, user_type, deposit):
             val = str(deposit)
             if '.' in val:
                 if len(val.rsplit('.')[-1]) > 2:
-                    print("That is not a valid deposit")
-                    return None
+                    return "That is not a valid deposit"
             #check deposit amount
             if deposit <= 0:
-                print("The deposit is too low")
-                return None
+                return "The deposit is too low"
 			#create User and Task
             print ("User made")
             user = User(name, username, password, user_type, "temp", deposit)
@@ -300,36 +399,34 @@ def register_user(name, username, password, user_type, deposit):
                     Task(user.get_id(),"new user")]
 		#this was when deposit was not right syntax
         except ValueError:
-            print("That is not a valid deposit")
-            return None
+            return "That is not a valid deposit"
 
 #pre: needs all the entries filled and an existing client id
-#post: will return and make a new project
+#post: will return and make a new project, and add project_id to client
 def create_project(client_id, title, desc, start_date, end_date):
     #check empty
     if title == "":
-        print("Title field is empty")
-        return None
+        return "Title field is empty"
     if desc == "":
-        print("Description field is empty")
-        return None
+        return "Description field is empty"
     if start_date == "":
-        print("Start date field is empty")
-        return None
+        return "Start date field is empty"
     if end_date == "":
-        print("End date field is empty")
-        return None
+        return "End date field is empty"
     if not find_row("user_db","id", client_id):
         print("User not found")
-        return None
-	#make sure end time > start time
+        return 'Nan'
+    #make sure end time > start time
     #uses helper_function
     s_date = string_to_datetime(start_date)
     e_date = string_to_datetime(end_date)
     if s_date >= e_date:
-        print("The end date must be after the start date")
-        return None
-    return Project(client_id, title, desc, start_date, end_date)
+        return "The end date must be after the start date"
+    project = Project(client_id, title, desc, start_date, end_date)
+    client = User()
+    client.load_db(client_id)
+    client.add_project_ids(project.get_id())
+    return project
 
 #pre: must have client and project id for input and bid_id must be new
 #    end>start date and client's balance >= bid
@@ -338,38 +435,34 @@ def create_bid(project_id, start_date, end_date, initial_bid):
     #check empty
     if start_date == "":
         print("Start date field is empty")
-        return None
+        return 'Nan'
     if end_date == "":
-        print("End date field is empty")
-        return None
+        return "End date field is empty"
     #check amount is positive
     if initial_bid < 0:
-        print("Initial bid must be positive")
-        return None
+        return "Initial bid must be positive"
     #check id consistencies
     project = jsonIO.get_row("project_db", project_id)
     if not project:
         print("Project not found")
-        return None
+        return 'Nan'
     bid = jsonIO.get_row("bid_db", project_id)
     if bid:
         print("Bid already exists")
-        return None
+        return 'Nan'
     user = jsonIO.get_row("user_db", project["client_id"])
     if not user:
         print("User not found")
-        return None
+        return 'Nan'
     #make sure client has money
     if float(user["balance"]) < initial_bid:
-        print("User does not have enough funds")
-        return None
+        return "User does not have enough funds"
     #make sure end time > start time
 	#uses helper_function
     s_date = string_to_datetime(start_date)
     e_date = string_to_datetime(end_date)
     if s_date >= e_date:
-        print("The end date must be after the start date")
-        return None
+        return "The end date must be after the start date"
     return Bid(project_id, start_date, end_date, initial_bid)
 	
 	
@@ -382,22 +475,24 @@ def create_bid(project_id, start_date, end_date, initial_bid):
 #      the team submits their work or until the deadline.
 #pre: from, to users exist and amount exists and is valid
 #post: it will modify both balances and create task.
-def project_fund_transfer(from_user, to_user, amount):
+def project_fund_transfer(from_user_id, to_user_id, amount):
+	from_user = User()
+	to_user = User()
+	from_user.load_db(from_user_id)
+	to_user.load_db(to_user_id)
 	if amount <= 0:
-		print("Must have a positive amount")
-		return 0
+		return "Must have a positive amount"
 	if from_user.get_id() == 'Nan':
 		print("The user you are grabbing from does not exist")
-		return 0
-	if to_user.get_id() == 'Nan':
-		print("The user you are sending to does not exist")
-		return 0
+		return 'Nan'
+	if (to_user.get_id() == 'Nan' or to_user.get_status() == "blacklisted" or
+		to_user.get_status() == "inactive" or to_user.get_status() == "rejected"):
+		return "The user you are sending to does not exist"
 	if from_user.get_balance() < amount:
-		print("The user does not have enough funds")
-		return 0
+		return "The user does not have enough funds"
 	if not from_user.get_project_ids:
-		print("The client has not initiated a project")
-		return 0
+		return "The client has not initiated a project"
+	#create a new Task after money transfers
 	from_user.withdraw(amount)
 	#take 10% and take 50% until completion of project
 	deduction = round(amount*.1*.5, 2)
@@ -406,33 +501,62 @@ def project_fund_transfer(from_user, to_user, amount):
 	jsonIO.set_value("user_db", 0, "balance", deduction)
 	to_user.deposit(amount)
 	#create a new task to retrieve the other 40% = 50%-10# fee
-	Task(from_user.get_project_ids[-1], "new project", True)
+	return Task(from_user.get_project_ids[-1], "new project", True)
 	
 	
 #/\/\/\/\METRICS/\/\/\/\METRICS/\/\/\/\METRICS/\/\/\/\METRICS/\/\/\/\METRICS/\/\/\/\
-
 #cond: dev    avg (dev,"team")
 #      team   avg (team,"team")
 #      client avg (client, "client")
 #pre: id must exists for all 
 #post: return average rate
 def get_grade(obj, user, dict = False):
-    grade = []
-    user+="_rating"
-    #grade for class
+	grade = []
+	user+="_rating"
+	#grade for class
+	if not dict:
+		if ((obj.get_user_type() == "client" and user == "client") or 
+			(obj.get_user_type() != "client"  and user == "team")):
+			for id in obj.get_project_ids():
+				grade.append(jsonIO.get_value("project_db", id, user))
+		else:
+			print ("Use types don't match")
+	#grade for dict
+	else:
+		if ((obj["get_user_type"] == "client" and user == "client") or 
+			(obj["get_user_type"] != "client"  and user == "team")):
+			for id in obj["project_ids"]:
+				grade.append(jsonIO.get_value("project_db", id, user))
+		else:
+			print ("Use types don't match")
+	#if rate exist return something
+	if grade:
+		return round(numpy.mean(grade), 2)
+	return 'Nan'
+	
+#cond: dev    total (dev)
+#      team   total (team)
+#pre: id must exists for all 
+#post: return total comssion
+def get_total_commision(obj, dict = 0):
+    commision = 0
+    #commision for class
     if not dict:
         for id in obj.get_project_ids():
-            grade.append(jsonIO.get_value("project_db", id, user))
-    #grade for dict
-    elif dict:
-        for id in obj["project_ids"]:
-            grade.append(jsonIO.get_value("project_db", id, user))
-    #if rate exist return something
+            #bid_id = project_id
+            bid = jsonIO.get_value("bid_db", id, "final_bid")
+            if bid:
+                commision += bid
+    #commision for dict
     else:
-        return None
-    if grade:
-        return max(numpy.mean(grade), 1)
-    return None
+        for id in obj["project_ids"]:
+            #bid_id = project_id
+            bid = jsonIO.get_value("bid_db", id, "final_bid")
+            if bid:
+                commision += bid
+    #if commision exist return something
+    return commision
+	
 	
 #/\/\/\/\HELPER FUNTIONS/\/\/\/\HELPER FUNTIONS/\/\/\/\HELPER FUNTIONS/\/\/\/\
 #pre: must have a valid db, key and value
@@ -468,7 +592,7 @@ def string_to_datetime(time):
 		return datetime.strptime(time, "%Y-%m-%d %H:%M:%S")
 	except:
 		print("String not in Y-m-d H:M:S form")
-		return None
+		return 'Nan'
 
 #pre: needs datetime in Y-m-d H:M:S form
 #post: returns string form
@@ -477,7 +601,7 @@ def datetime_to_string(dt_time):
 		return dt_time.strftime("%Y-%m-%d %H:%M:%S")
 	except:
 		print("Datetime not in Y-m-d H:M:S form")
-		return None
+		return 'Nan'
 		
 #pre: needs time in string and n days to be added
 #post: return string with added days
@@ -488,22 +612,26 @@ def get_n_days_later(time, n):
 	
 #pre: both user must exist, client must have enough funds, and amount must be valid 
 #post: transfer money from user to user.
-def tranfer_funds(from_user, to_user, amount):
-    if amount <= 0:
-        print("Must have a positive amount")
-        return 0
-    if from_user.get_id() == 'Nan':
-        print("The user you are grabbing from does not exist")
-        return 0
-    if to_user.get_id() == 'Nan':
-        print("The user you are sending to does not exist")
-        return 0
-    if from_user.get_balance() < amount:
-        print("The user does not have enough funds")
-        return 0
-    from_user.withdraw(amount)
-    to_user.deposit(amount)
-    return 1
+def tranfer_funds(from_user_id, to_user_id, amount):
+	from_user = User()
+	to_user = User()
+	from_user.load_db(from_user_id)
+	to_user.load_db(to_user_id)
+	if amount <= 0:
+		print("Must have a positive amount")
+		return 0
+	if from_user.get_id() == 'Nan':
+		print("The user you are grabbing from does not exist")
+		return 0
+	if to_user.get_id() == 'Nan':
+		print("The user you are sending to does not exist")
+		return 0
+	if from_user.get_balance() < amount:
+		print("The user does not have enough funds")
+		return 0
+	from_user.withdraw(amount)
+	to_user.deposit(amount)
+	return 1
 	
 #cond: dict will contain a dict of user (has "team_id and id")
 #pre: team_id must exits
@@ -516,3 +644,23 @@ def is_admin(dict):
        for admin in team["admin_ids"]:
            if dict["id"] == admin:
                return True
+			   
+#cond: will erase if there is no admin and return a truth
+#pre: the team_id is valid
+#post: will delete team if there is no admin and return true
+#      will also kick developers out and update their team_id to 'Nan'
+#      else it will return false
+def erase_empty_team(team_id):
+	team = jsonIO.get_row("team_db", team_id)
+	if not team:
+		print ("Team does not exist")
+		return 0
+	if team["admin_ids"]:
+		return 0
+	if team["developer_ids"]:
+		for dev_id in team["developer_ids"]:
+			jsonIO.set_value("user_db", "team_id", 'Nan')
+	jsonIO.del_row("team_db", team_id)
+	return 1
+	
+	

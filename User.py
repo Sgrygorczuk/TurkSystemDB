@@ -26,7 +26,7 @@ class User:
 			
 	#create a new user in class only
 	def set_all(self, name, username, password, user_type, balance,
-		status, warning, resume="", pic="", interest="", issue_ids = [], team_id = 'Nan', project_ids = [], modify_db = 0):
+		status, warning = 0, resume="", pic="", interest="", issue_ids = [], team_id = 'Nan', project_ids = [], modify_db = 0):
 		#userCred_db
 		self.name = name
 		self.username = username
@@ -40,10 +40,16 @@ class User:
 		self.resume = resume
 		self.pic = pic
 		self.interest = interest
-		self.issue_ids = list(issue_ids)
+		if issue_ids and issue_ids!= None:
+			self.issue_ids = list(issue_ids)
+		else:
+			self.issue_ids = []
 		#for registered only
 		self.team_id = team_id
-		self.project_ids = list(project_ids) #list of project ids that has been worked or active
+		if project_ids and project_ids!= None:
+			self.project_ids = list(project_ids) #list of project ids that has been worked or active
+		else:
+			self.project_ids = []
 		if modify_db:
 			jsonIO.set_row(self.db, self.get_all())
 		
@@ -96,7 +102,7 @@ class User:
 		return self.project_ids
 	def get_all(self):
 		return {"id":self.id, "name":self.name, "username":self.username, "password":self.password,
-		"user_type":self.user_type, "balance":self.balance, "status":self.status, "warning":self.balance,
+		"user_type":self.user_type, "balance":self.balance, "status":self.status, "warning":self.warning,
 		"resume":self.resume, "pic":self.pic, "interest":self.interest, "issue_ids":self.issue_ids,
 		"team_id":self.team_id, "project_ids":self.project_ids}
 		
@@ -152,9 +158,9 @@ class User:
 		self.pic = pic
 		jsonIO.set_value(self.db, self.id, "pic", pic)
 		return 1
-	def set_interest(self, insterest):
-		self.insterest = insterest
-		jsonIO.set_value(self.db, self.id, "insterest", insterest)
+	def set_interest(self, interest):
+		self.interest = interest
+		jsonIO.set_value(self.db, self.id, "interest", interest)
 		return 1
 	def add_issue_ids(self, issue_id):
 		if issue_id != 'Nan':
@@ -163,7 +169,7 @@ class User:
 			return 1
 		return 0
 	def set_Issue_ids(self, issue_ids):
-		if issue_ids:
+		if issue_ids and issue_ids!= None:
 			self.issue_ids = list(issue_ids)
 			jsonIO.set_value(self.db, self.id, "issue_ids", self.issue_ids)
 			return 1
@@ -181,7 +187,7 @@ class User:
 			return 1
 		return 0
 	def set_project_ids(self, project_ids):
-		if project_ids:
+		if project_ids and project_ids!= None:
 			self.project_ids = list(project_ids)
 			jsonIO.set_value(self.db, self.id, "project_ids", self.project_ids)
 			return 1
