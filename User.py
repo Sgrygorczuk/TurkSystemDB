@@ -32,25 +32,26 @@ class User:
 		self.username = username
 		self.password = password
 		#user_db
-		self.user_type = user_type #dev, client, SU
-		self.balance = balance #must be positive
-		self.status = status #(active, blacklisted, temp, rejected, inactive)
-		self.warning = warning
+		self.user_type = user_type 					# dev, client, SU
+		self.balance = balance 						# must be positive
+		self.status = status 						# (active, blacklisted, temp, rejected, inactive)
+		self.warning = warning						# warning given from bad rating or not finishing project
 		#userInfo
 		self.resume = resume
 		self.pic = pic
+		#the interest variable must exist or it will be an empty array
 		if interest:
-			self.interest = list(interest)
+			self.interest = list(interest)			# will be used to recommend: for dev a project, and for client a dev
 		else:
 			self.interest = []
 		if issue_ids:
-			self.issue_ids = list(issue_ids)
+			self.issue_ids = list(issue_ids)		# a list of issue sent by the user
 		else:
 			self.issue_ids = []
 		#for registered only
-		self.team_id = team_id
+		self.team_id = team_id						# team_id of the team a dev joined, for client it will be 'Nan'
 		if project_ids:
-			self.project_ids = list(project_ids) #list of project ids that has been worked or active
+			self.project_ids = list(project_ids)	# list of project ids that has been worked or active
 		else:
 			self.project_ids = []
 		if modify_db:

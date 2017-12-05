@@ -33,17 +33,18 @@ img_folder = os.getcwd()+"/images"
 #post: prints all available commands
 def get_commands():
 	print ('''-------------------------------------------------------------------------------------
-Direct Databse access
+Direct Database access
 	get_value(obj, key, id = 'Nan'): gets value
 	get_all_db(obj): gets all from db
 	get_row(obj, key): gets an entire row
+	get_col(obj, key): returns the whole column of an attribute
 	print_table(m): prints the table given a dictionary or a list of it
 -------------------------------------------------------------------------------------
 SU
 	user_report(user, id = 'Nan'): returns status of the user:
 		user_type, status, warning, and balance
 	verify(username, password = ""): returns [case number, user, message]
-	*not made*project_completion : decides what to do after project is completed
+	*not made*finalize_bid : decides what to do after project is completed
 		what to do with bid money
 		and other modifications
 	quit_request: user is removed and will call quit_team
@@ -69,8 +70,7 @@ Special functions
 	request_join(team_dict, user_id):  will add user to the team and update team's dev_ids
 	accept_team(team_dict, user_id): user's team_id will be updated and team's request list will shrink
 	reject_team(team_dict, user_id): team's request list will shrink
-	*not made*start_bid
-	*not made*bid_process
+	*not made*make_bid: first check if project == "inactive" != active -> call bid
 	*not made*end_bid: make needed modifications such as penalty or set_team_id
 	*not made*make_rating(user_id, rating)
 -------------------------------------------------------------------------------------
@@ -87,6 +87,8 @@ Helper functions
 	datetime_to_string(dt_time): returns string form
 	get_n_days_later(time, n): return string with added days 
 	tranfer_funds(from_user, to_user, amount): it will modify both balances
+	get_chosen_bid(project_id, only_id = False): gets bid_log of winner bidder
+	is_in_active_project(user): check if user is active
 	is_admin(dic): returns true if user is team admin
 	promote(team_dict, user_id): user becomes admin in team
 	demote(team_dict, user_id): admin becomes user
@@ -245,7 +247,7 @@ def verify(username, password = None):
 			if user["warning"] == 2:
 				if user["status"] != "blacklisted":
 					case = 6
-					message = "User found, but has 2 warnings and not yet black listed"
+					message = "User found, but has 2 warnings and not yet blacklisted"
 				#blacklisted already checked
 			elif user["status"] == "rejected":
 				case = 7
@@ -260,7 +262,7 @@ def verify(username, password = None):
 		elif user["warning"] == 2:
 			if user["status"] != "blacklisted":
 				case = 10
-				message = "Login successful, but has 2 warnings and not yet black listed"
+				message = "Login successful, but has 2 warnings and not yet blacklisted"
 		elif user["status"] == "rejected":
 				case = 11
 				message = "Login successful, but temporary user was rejected"
@@ -514,7 +516,8 @@ def project_fund_transfer(from_user_id, to_user_id, amount):
 	deduction = round(amount*.1*.5, 2)
 	amount -= deduction
 	#keep it in superuser's bank
-	jsonIO.set_value("user_db", 0, "balance", deduction)
+	su_balance = jsonIO.get_value("user_db", 0, "balance") + deduction
+	jsonIO.set_value("user_db", 0, "balance", su_balance)
 	to_user.deposit(amount)
 	#create a new issue to retrieve the other 40% = 50%-10# fee
 	return Issue(from_user.get_project_ids[-1], "new project", True)
@@ -716,19 +719,20 @@ def tranfer_funds(from_user_id, to_user_id, amount):
 	to_user.deposit(amount)
 	return 1
 
-def get_bid_log(project_id, only_id = False):
-	bid_id = jsonIO.get_value("project_db", project_id, "bid_id")
-	if bid_id == None:
-		print("Bid not found")
+def get_chosen_bid(project_id, only_id = False):
+	chosen_index = jsonIO.get_value("project_db", project_id, "chosen_index")
+	if chosen_index == None:
+		print("Bidder was not yet chosen")
 		return []
 	bid_log = jsonIO.get_value("bid_db", bid_id, "bid_log")
 	if not bid_log or bid_log == [[]]:
 		print("Bid log is empty")
 		return []
 	if only_id:
-		return bid_log[0][1]
+		return bid_log[chosen_index][0]
 	else:
-		return bid_log
+		return bid_log[chosen_index]
+
 #pre: user must exist
 #pro: check if user is active
 def is_in_active_project(user):
@@ -807,3 +811,5 @@ def set_pic(src, user_id = None, image_name = None, dst = img_folder):
     #set the name in the database
     jsonIO.set_value("user_db", user_id, "pic", new_name)
     return "File copied"
+
+def get_file

@@ -24,27 +24,28 @@ class Team:
 	
 	#create a new team in class only
 	def set_all(self, admin_ids, dev_ids, name, pic, desc, project_ids, active_project, join_request_ids, status, modify_db = 0):
+		#should make sure array is not empty
 		if admin_ids:
-			self.admin_ids = list(admin_ids)
+			self.admin_ids = list(admin_ids)					#admins are also include inside dev_ids
 		else:
-			self.admin_ids = []
+			self.admin_ids = []	
 		if dev_ids:
-			self.dev_ids = list(dev_ids)
+			self.dev_ids = list(dev_ids)						#devs who are in the team
 		else:
 			self.dev_ids = []
 		self.name = name
 		self.pic = pic
 		self.desc = desc
 		if project_ids:
-			self.project_ids = list(project_ids)
+			self.project_ids = list(project_ids)				#project done together (will be used to find average of project done together)
 		else:
 			self.project_ids = []
-		self.active_project = active_project
+		self.active_project = active_project					#current project being worked on
 		if join_request_ids:
-			self.join_request_ids = list(join_request_ids)
+			self.join_request_ids = list(join_request_ids)		#join request sent by dev
 		else:
 			self.join_request_ids = []
-		self.status = status
+		self.status = status									#active and inactive
 		if modify_db:
 			jsonIO.set_row(self.db, self.get_all())
 		

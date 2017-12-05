@@ -4,15 +4,15 @@ class Project:
 	db = "project_db"
 	
 	def __init__(self, client_id='Nan', title="", desc="", deadline="", bid_end_date="",
-		bid_id='Nan', client_rating = 0, team_rating = 0, client_review = "", team_review = "", status=""):
+		bid_id='Nan', submission = "", client_rating = 0, team_rating = 0, client_review = "", team_review = "", status=""):
 		self.id = 'Nan'
 		#might call new_project later on
-		self.new_project(client_id, title, desc, deadline, bid_end_date, bid_id, client_rating, team_rating, client_review, team_review, status)
+		self.new_project(client_id, title, desc, deadline, bid_end_date, bid_id, submission, client_rating, team_rating, client_review, team_review, status)
 
 	#create a new project in db and in class
 	def new_project(self, client_id, title, desc, deadline, bid_end_date = "",
-		bid_id='Nan', client_rating = 0, team_rating = 0, client_review = "", team_review = "", status = "inactive"):
-		self.set_all(client_id, title, desc, deadline, bid_end_date, bid_id, client_rating, team_rating, client_review, team_review, status)
+		bid_id='Nan', submission = "", client_rating = 0, team_rating = 0, client_review = "", team_review = "", status = "inactive"):
+		self.set_all(client_id, title, desc, deadline, bid_end_date, bid_id, submission, client_rating, team_rating, client_review, team_review, status)
 		#make new class if not called explicitly
 		if title:
 			self.id = jsonIO.get_last_id(self.db)
@@ -25,18 +25,20 @@ class Project:
 			jsonIO.add_row(self.db, self.get_all())
 	
 	#create a new project in class only
-	def set_all(self, client_id, title, desc, deadline, bid_end_date, bid_id, client_rating, team_rating, client_review, team_review, status, modify_db = 0):
+	def set_all(self, client_id, title, desc, deadline, bid_end_date,
+		bid_id, submission, client_rating, team_rating, client_review, team_review, status, modify_db = 0):
 		self.client_id = client_id
 		self.title = title
 		self.desc = desc
-		self.deadline = deadline
-		self.bid_end_date = bid_end_date
-		self.bid_id = bid_id
-		self.client_rating = client_rating
-		self.team_rating = team_rating
-		self.client_review = client_review
-		self.team_review = team_review
-		self.status = status #inactive, active, complete, incomplete
+		self.deadline = deadline			# when should the project be done by
+		self.bid_end_date = bid_end_date	# when should the bid end
+		self.bid_id = bid_id				# refers to the bid
+		self.submission = submission		# refers to the name of the project
+		self.client_rating = client_rating	# client's rating of team
+		self.team_rating = team_rating		# team's rating of client
+		self.client_review = client_review	# client's explanation of low rating
+		self.team_review = team_review		# team's explanation of low rating
+		self.status = status 				# inactive-> bidding-> active-> no bid / submitted -> complete, incomplete
 		if modify_db:
 			jsonIO.set_row(self.db, self.get_all())
 		
@@ -53,7 +55,7 @@ class Project:
 	#breakdown the dictionary and load into the class
 	def dump(self,dict):
 		self.set_all(dict["client_id"], dict["title"], dict["desc"], dict["deadline"], dict["bid_end_date"],
-		dict["bid_id"], dict["client_rating"], dict["team_rating"], dict["client_review"], dict["team_review"], dict["status"])
+		dict["bid_id"], dict["submission"], dict["client_rating"], dict["team_rating"], dict["client_review"], dict["team_review"], dict["status"])
 		
 	#get_ methods
 	def get_id(self): 
@@ -70,6 +72,8 @@ class Project:
 		return self.bid_end_date
 	def get_bid_id(self): 
 		return self.bid_id
+	def get_submission(self): 
+		return self.submission
 	def get_client_rating(self): 
 		return self.client_rating
 	def get_team_rating(self): 
@@ -82,7 +86,7 @@ class Project:
 		return self.status
 	def get_all(self):
 		return {"id":self.id, "client_id":self.client_id, "title":self.title, "desc":self.desc, "deadline":self.deadline,
-		"bid_end_date":self.bid_end_date, "bid_id":self.bid_id, "client_rating":self.client_rating, "team_rating":self.team_rating,
+		"bid_end_date":self.bid_end_date, "bid_id":self.bid_id, "submission":self.submission, "client_rating":self.client_rating, "team_rating":self.team_rating,
 		"client_review": self.client_review, "team_review":self.team_review, "status":self.status}
 	
 	#update project_db
@@ -109,6 +113,10 @@ class Project:
 	def set_bid_id(self, bid_id):
 		self.bid_id = bid_id
 		jsonIO.set_value(self.db, self.id, "bid_id", bid_id)
+		return 1
+	def set_submission(self, submission):
+		self.submission = submission
+		jsonIO.set_value(self.db, self.id, "submission", submission)
 		return 1
 	def set_client_rating(self, client_rating):
 		if client_rating <= 5 and client_rating >= 1:
